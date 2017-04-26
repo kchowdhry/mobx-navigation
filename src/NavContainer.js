@@ -53,7 +53,7 @@ export default class NavContainer extends React.Component {
   }
 
   cards() {
-    return this.navState.elementPool.elements().map(
+    return this.navState.elementPool.orderedElements().map(
       element => <NavCard key={element.key} element={element} height={this.height} width={this.width} />);
   }
 

@@ -23,19 +23,20 @@ class ElementPool {
   // Mobx observable maps do not allow object keys so we make the instance pool a custom observable
   atom = new Atom('Nav instance pool');
   // Map from string or node to object with instance, refcount, and key
-  nodes = new Map();
+  elements = new Map();
   // Set of keys that are currently orphaned
-  orphanedNodes = new Set();
+  orphanedElements = new Set();
 
   constructor(navState: NavState) {
     this.navState = navState;
   }
 
-  elements(): Array<React.Component> {
+  // Returns elements in proper z-indexed order for top-level rendering purposes
+  orderedElements(): Array<React.Component> {
     this.atom.reportObserved();
     const onscreen = [];
     const offscreen = [];
-    this.nodes.forEach((element) => {
+    this.elements.forEach((element) => {
       if (element.refCount > 0) {
         if (element.isFront) {
           onscreen.push(element);
@@ -55,7 +56,7 @@ class ElementPool {
     // nav node sharing the same hint as this one
     let id = node.hint || node;
 
-    let value = this.nodes.get(id);
+    let value = this.elements.get(id);
     if (value) {
       value.refCount += 1;
       // Because the refcount is greater than one, this element is used elsewhere so we clone it in this case
@@ -66,12 +67,12 @@ class ElementPool {
         node.component.navConfig.initNavProps(node.props) : null;
       const instance = node.createInstance(navProps);
       value = new NavElement(this.navState, instance, navProps, node.component.navConfig);
-      this.nodes.set(id, value);
+      this.elements.set(id, value);
     }
 
     if (node.hint) {
       // Noop if this node was not previously orphaned
-      this.orphanedNodes.delete(node.hint);
+      this.orphanedElements.delete(node.hint);
     }
 
     return value;
@@ -79,15 +80,21 @@ class ElementPool {
 
   release(node: NavNode) {
     let id = node.hint || node;
-    const value = this.nodes.get(id);
+    const value = this.elements.get(id);
     if (value) {
       value.refCount -= 1;
       if (value.refCount === 0) {
         if (node.hint) {
-          this.orphanedNodes.add(node.hint);
+          this.orphanedElements.add(node.hint);
+          if (this.orphanedElements.size > INSTANCE_FREE_WATERMARK) {
+            // Remove the oldest orphaned element from the pool
+            const toRemove = this.orphanedElements.values().next().value;
+            this.atom.reportChanged();
+            this.elements.delete(toRemove);
+          }
         } else {
           this.atom.reportChanged();
-          this.nodes.delete(id);
+          this.elements.delete(id);
         }
       }
     } else {
@@ -96,8 +103,8 @@ class ElementPool {
   }
 
   flush() {
-    this.nodes = new Map();
-    this.orphanedNodes = new Set();
+    this.elements = new Map();
+    this.orphanedElements = new Set();
     this.atom.reportChanged();
   }
 }
