@@ -11,19 +11,29 @@ import { NavState } from './NavState';
 import NavTabBar from './NavTabBar';
 import NavCard from './NavCard';
 
+import Log from './Logger';
+
 const TransitionState = {
   NONE: 0,
   PUSH: 1,
   POP: 2,
 };
 
+const defaultConfig = {
+  navBarHeight: 68,
+  tabBarHeight: 50,
+  logLevel: Log.Level.INFO,
+}
+
 // Top level container for all navigation elements and scenes
 @observer
 export default class NavContainer extends React.Component {
   static propTypes = {
     navBarHeight: PropTypes.number,
+    navBarStyle: View.propTypes.style,
     tabBarHeight: PropTypes.number,
     tabStyle: View.propTypes.style,
+    logLevel: PropTypes.number,
   };
 
   @observable width;
@@ -31,10 +41,9 @@ export default class NavContainer extends React.Component {
 
   constructor(props) {
     super(props);
-    this.navState = new NavState({
-      navBarHeight: props.navBarHeight || 68,
-      tabBarHeight: props.tabBarHeight || 50,
-    }, props.initialScene, props.initialProps);
+    const config = {...defaultConfig, ...props};
+
+    this.navState = new NavState(config);
     const { height, width } = Dimensions.get('window');
     this.width = width;
     this.height = height;

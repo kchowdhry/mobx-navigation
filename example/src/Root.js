@@ -199,7 +199,11 @@ const TabCommon = (props) => {
 export default class Root extends React.Component {
   render() {
     return (
-      <NavContainer initialScene={TestScene} initialProps={{ text: 'hello world' }}>
+      <NavContainer
+        initialScene={TestScene}
+        initialProps={{ text: 'hello world' }}
+        logLevel={0}
+      >
         <NavTab initialScene={Tab1} name={'1'} isInitial />
         <NavTab initialScene={Tab2} name={'2'} />
         <NavTab initialScene={Tab3} name={'3'} initialProps={{ color: 'red' }} />

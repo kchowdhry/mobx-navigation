@@ -1,6 +1,7 @@
 import { Atom, action, computed, observable } from 'mobx';
 import React from 'react';
 import { Animated } from 'react-native';
+import Log from './Logger';
 
 // Conceptually, a scene graph looks like a acyclic graph with a single root. The data structure defined
 // by this class needs to support the following operations:
@@ -37,14 +38,12 @@ class ElementPool {
     const onscreen = [];
     const offscreen = [];
     this.elements.forEach((element) => {
-      if (element.refCount > 0) {
-        if (element.isFront) {
-          onscreen.push(element);
-        } else if (element.isBack) {
-          onscreen.unshift(element);
-        } else {
-          offscreen.push(element);
-        }
+      if (element.isFront) {
+        onscreen.push(element);
+      } else if (element.isBack) {
+        onscreen.unshift(element);
+      } else {
+        offscreen.push(element);
       }
     });
     return onscreen.concat(offscreen);
@@ -58,10 +57,13 @@ class ElementPool {
 
     let value = this.elements.get(id);
     if (value) {
+      Log.trace(`Found cached element for hint ${id}`);
       value.refCount += 1;
-      // Because the refcount is greater than one, this element is used elsewhere so we clone it in this case
-      // instance = React.cloneElement(value.instance);
     } else {
+      if (node.hint) {
+        Log.trace(`Creating new cached element for hint ${id}`);
+      }
+
       this.atom.reportChanged();
       const navProps = (node.component.navConfig && node.component.navConfig.initNavProps) ?
         node.component.navConfig.initNavProps(node.props) : null;
@@ -91,8 +93,10 @@ class ElementPool {
             const toRemove = this.orphanedElements.values().next().value;
             this.atom.reportChanged();
             this.elements.delete(toRemove);
+            Log.trace('Removing orphaned node ${toRemove}');
           }
         } else {
+          Log.trace(`Removing anonymous element ${node.componentName} from the pool`);
           this.atom.reportChanged();
           this.elements.delete(id);
         }
@@ -102,7 +106,10 @@ class ElementPool {
     }
   }
 
+  // Note, in the same callback as the invocation of this function, new scenes should be added
+  // afterwards so that the root nav container has something to display
   flush() {
+    Log.info('Flushing all elements from the element pool');
     this.elements = new Map();
     this.orphanedElements = new Set();
     this.atom.reportChanged();
@@ -197,6 +204,10 @@ export class NavNode {
   @observable component;
   @observable props;
 
+  get componentName() {
+    return this.component.name;
+  }
+
   get hint() {
     if (this._hint) {
       return this._hint;
@@ -268,8 +279,16 @@ export class NavState {
 
   @observable transitionValue; // React.Native animated value between 0 and 1
 
-  constructor(config, initialScene: React.Component, initialSceneProps: Object) {
-    this.rootNode = new NavNode(this, initialScene, initialSceneProps);
+  // See propTypes and default config in NavContainer
+  constructor(config) {
+    if (!config.initialScene) {
+      Log.error('Attempted to construct a NavState without an initial scene');
+      return;
+    }
+
+    Log.setLogLevel(config.logLevel);
+
+    this.rootNode = new NavNode(this, config.initialScene, config.initialProps);
 
     this.transitionValue = new Animated.Value(1);
     this.startTransition(this.rootNode);
@@ -281,6 +300,7 @@ export class NavState {
   // resolution, it is expected that the caller clean up any nodes that are now orphaned
   @action startTransition(node: NavNode): Promise<> {
     if (!node) {
+      Log.error(`Attempting to transition to empty node`);
       return Promise.reject();
     }
 
@@ -321,6 +341,7 @@ export class NavState {
   }
 
   @action endTransition = (node) => {
+    Log.trace(`Transitioned to node ${node.componentName}/${node.hint || ''}`);
     this.front = node;
     this.transitionValue = new Animated.Value(1);
     this.back = null;

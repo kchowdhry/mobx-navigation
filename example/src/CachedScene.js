@@ -9,7 +9,7 @@ import {
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 
-const ref = null;
+const createdCount = 0;
 
 @observer
 export default class CachedScene extends React.Component {
@@ -19,20 +19,22 @@ export default class CachedScene extends React.Component {
     cacheHint: props => props.key,
   }
 
-  componentWillMount() {
-    if (!ref) {
-      ref = this;
-      this.message = 'hurray';
-    } else {
-      this.message = 'error';
-    }
+  @observable counter = 0;
+
+  constructor(props) {
+    super(props);
+    createdCount += 1;
   }
 
   render() {
     return (
       <View style={{flex: 1, backgroundColor: 'white'}}>
         <Text>
-          {this.message}
+          {this.counter}
+        </Text>
+        <Button title='increment!' onPress={() => this.counter += 1} />
+        <Text>
+          {`There have been ${createdCount} created instance(s).`}
         </Text>
       </View>
     )
