@@ -7,6 +7,8 @@ import {
 
 import { NavContainer, NavTab } from '../..';
 
+import ComplexScene from './ComplexScene';
+
 const TestScene = (props) => {
   const onPress = () => {
     props.navState.push(TestScene2);
@@ -138,9 +140,14 @@ const Tab3 = (props) => {
     props.navState.push(Tab3Scene1);
   };
 
+  const onPress2 = () => {
+    props.navState.push(ComplexScene, { title: 'start' });
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white', marginTop: 20 }}>
       <Button title={'Tab 3'} onPress={onPress} />
+      <Button title={'Complex'} onPress={onPress2} />
     </View>
   );
 }

@@ -60,7 +60,7 @@ export default class NavTabBar extends React.Component {
     };
 
     // Check if the active scene should hide the tab bar
-    const hide = this.props.navState.activeNode.tabBarVisible ? null : {
+    const hide = this.props.navState.activeNode && this.props.navState.activeNode.tabBarVisible ? null : {
       transform: [
         {
           translateX: 100000

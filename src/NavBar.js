@@ -6,6 +6,8 @@ import {
   View,
 } from 'react-native';
 
+import PropTypes from 'prop-types';
+
 import { inject, observer } from 'mobx-react';
 
 const styles = StyleSheet.create({
@@ -74,6 +76,7 @@ const RightButton = (props) => {
 @inject('navState') @observer
 export default class NavBar extends React.Component {
   static propTypes = {
+    navProps: PropTypes.object,
     style: View.propTypes.style,
   };
 
@@ -86,20 +89,14 @@ export default class NavBar extends React.Component {
       bottom: this.props.height - this.props.navState.config.navBarHeight,
     };
 
-    const hide = this.props.navState.activeNode.navBarVisible ? null : {
-      transform: [
-        {
-          translateX: 100000
-        }
-      ]
-    }
+    const props = { ...this.props, navProps: this.props.navProps };
 
     return (
-      <View style={[styles.container, style, this.props.style, hide]}>
+      <View style={[styles.container, style, this.props.style]}>
         <View style={styles.buttons}>
-          {React.createElement(left, this.props)}
-          {React.createElement(center, this.props)}
-          {React.createElement(right, this.props)}
+          {React.createElement(left, props)}
+          {React.createElement(center, props)}
+          {React.createElement(right, props)}
         </View>
       </View>
     )

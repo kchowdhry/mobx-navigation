@@ -1,5 +1,6 @@
 import { action, computed, observable } from 'mobx';
 import React from 'react';
+import { Animated } from 'react-native';
 
 // Conceptually, a scene graph looks like a acyclic graph with a single root. The data structure defined
 // by this class needs to support the following operations:
@@ -26,13 +27,20 @@ class InstancePool {
   counter: number = 0;
 
   instances(): Array<React.Component> {
-    const result = [];
+    const onscreen = [];
+    const offscreen = [];
     this.nodes.forEach((element) => {
       if (element.refCount > 0) {
-        result.push(element);
+        if (element.node.isFront) {
+          onscreen.push(element);
+        } else if (element.node.isBack) {
+          onscreen.unshift(element);
+        } else {
+          offscreen.push(element);
+        }
       }
     });
-    return result;
+    return onscreen.concat(offscreen);
   }
 
   // The hint is intended to be an object reference to a set of props used to define
@@ -47,12 +55,16 @@ class InstancePool {
       value.refCount += 1;
       instance = value.instance;
     } else {
-      instance = node.createInstance();
+      const navProps = (node.component.navConfig && node.component.navConfig.initNavProps) ?
+        node.component.navConfig.initNavProps(node.props) : null;
+      instance = node.createInstance(navProps);
       this.counter += 1;
       this.nodes.set(id, {
         refCount: 1,
         instance,
         key: this.counter,
+        node,
+        navProps,
       });
     }
 
@@ -91,7 +103,13 @@ export const Motion = {
   NONE: 0,
   SLIDE_ON: 1,
   SLIDE_OFF: 2,
-}
+};
+
+export const Position = {
+  FRONT: 0,
+  BACK: 1,
+  OFFSCREEN: 2,
+};
 
 export class NavNode {
   // Back reference to root object
@@ -102,25 +120,22 @@ export class NavNode {
 
   instance: React.Component;
 
+  @observable position: number = Position.OFFSCREEN;
+
   get next() {
     return this._next;
   }
 
   set next(newNext: NavNode) {
-    if (!newNext) {
-      // All nodes after this one must be orphaned
-      let next = this._next;
-      while (next) {
-        if (next._instance) {
-          this.navState.instancePool.release(next);
-        }
-        next = next.next;
-      }
+    // All nodes after this one must be orphaned
+    let next = this._next;
+    while (next) {
+      this.navState.instancePool.release(next);
+      next = next.next;
     }
     this._next = newNext;
   }
 
-  // If the component is non-null, this is a terminating node that represents an actual scene
   @observable component;
   @observable props;
 
@@ -137,13 +152,6 @@ export class NavNode {
   // If this scene is used as the root of a tab, the configuration governing the tab are housed here
   @observable tabConfig;
 
-  // True if this node contains the scene that should be on the foreground
-  @observable active: boolean = false;
-
-  // If this is non empty, than this is *not* a tab scene
-  // This map maps from tab key to NavNodes
-  @observable children = new observable.map();
-
   constructor(navState, component = null, props = {}) {
     this.navState = navState;
     this.component = component;
@@ -159,11 +167,36 @@ export class NavNode {
     return this.next.tail;
   }
 
-  createInstance() {
+  createInstance(navProps) {
     return React.createElement(this.component, {
       navState: this.navState,
+      navProps,
       ...this.props
     });
+  }
+
+  get isFront() {
+    return this.position === Position.FRONT;
+  }
+
+  moveToFront() {
+    this.position = Position.FRONT;
+  }
+
+  get isBack() {
+    return this.position === Position.BACK;
+  }
+
+  moveToBack() {
+    this.position = Position.BACK;
+  }
+
+  get isOffscreen() {
+    return this.position === Position.OFFSCREEN;
+  }
+
+  moveOffscreen() {
+    this.position = Position.OFFSCREEN;
   }
 
   get tabBarVisible(): boolean {
@@ -210,6 +243,8 @@ export class NavState {
   // foreground or sliding off the background respectively
   @observable motion: number = Motion.NONE;
 
+  @observable transitionValue; // React.Native animated value between 0 and 1
+
   // tabs correspond to a map from tab id to an object of the form
   // {
   //   component: React.Component,
@@ -219,9 +254,56 @@ export class NavState {
   constructor(config, initialScene: React.Component, initialSceneProps: Object) {
     this.rootNode = new NavNode(this, initialScene, initialSceneProps);
 
-    this.activeNode = this.rootNode;
+    this.transitionValue = new Animated.Value(1);
+    this.startTransition(this.rootNode);
 
     this.config = config;
+  }
+
+  // Returns a promise that resolves when the transition to the new node has completed. In the promise
+  // resolution, it is expected that the caller clean up any nodes that are now orphaned
+  @action startTransition(node: NavNode): Promise<> {
+    // Move nodes to the correct z-index as necessary
+    if (this.motion === Motion.NONE) {
+      node.moveToFront();
+    } else if (this.motion === Motion.SLIDE_ON) {
+      this.activeNode.moveToBack();
+      node.moveToFront();
+    } else if (this.motion === Motion.SLIDE_OFF) {
+      this.activeNode.moveToFront();
+      node.moveToBack();
+    }
+
+    // TODO custom callbacks
+    if (this.motion === Motion.NONE) {
+      this.endTransition(node);
+      return Promise.resolve();
+    }
+
+    let start = 0;
+    let end = 1;
+    if (this.motion === Motion.SLIDE_OFF) {
+      start = 1;
+      end = 0;
+    }
+    this.transitionValue = new Animated.Value(start);
+    return new Promise((resolve) => {
+      Animated.timing(this.transitionValue, {
+        toValue: end,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => {
+        this.endTransition(node);
+        resolve();
+      });
+    });
+  }
+
+  @action endTransition = (node) => {
+    if (this.activeNode) {
+      this.activeNode.moveOffscreen();
+    }
+    this.activeNode = node;
   }
 
   // Nav tab configuration:
@@ -269,7 +351,6 @@ export class NavState {
 
     tail.next = node;
     node.previous = tail;
-    this.activeNode = node;
 
     if (targetTab !== this.activeTab) {
       this.motion = Motion.NONE;
@@ -277,31 +358,38 @@ export class NavState {
     } else {
       this.motion = Motion.SLIDE_ON;
     }
+
+    this.startTransition(node);
   }
 
   @action pop() {
-    // check if there is something to pop to
-    this.activeNode = this.activeNode.previous;
     this.motion = Motion.SLIDE_OFF;
+    this.startTransition(this.activeNode.previous).then(() => {
+      this.activeNode.next = null;
+    });
   }
 
   @action replace(scene, props) {
     const currentActive = this.activeNode;
-    this.activeNode = new NavNode(this, scene, props);
-    this.activeNode.next = currentActive.next;
-    this.activeNode.previous = currentActive.previous;
+    const newActive = new NavNode(this, scene, props);
+    newActive.next = currentActive.next;
+    newActive.previous = currentActive.previous;
     this.motion = Motion.NONE;
+    this.startTransition(newActive).then(() => {
+      this.instancePool.release(currentActive);
+    });
   }
 
   @action tabs() {
     // Calling this function causes a replacement transition to the scene associated to the initial tab
-    this.activeNode = this.initialTab;
-    this.activeTab = this.activeNode.tabConfig.name;
+    this.activeTab = this.initialTab.tabConfig.name;
     this.motion = Motion.NONE;
+    this.startTransition(this.initialTab);
   }
 
   @action tab(name: string) {
     if (this.activeTab === name) {
+      this.motion = Motion.NONE;
       const root = this.tabNodes.get(name);
 
       if (root.tabConfig.disableQuickReset) {
@@ -309,13 +397,13 @@ export class NavState {
         return;
       }
 
-      this.activeNode = root;
-      root.next = null;
+      this.startTransition(root).then(() => {
+        root.next = null;
+      });
       // TODO: handle orphaning
     } else {
-      this.activeNode = this.tabNodes.get(name).tail;
       this.activeTab = name;
+      this.startTransition(this.tabNodes.get(name).tail);
     }
-    this.motion = Motion.NONE;
   }
 }
