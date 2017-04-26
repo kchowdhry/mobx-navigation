@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Button,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -43,14 +44,19 @@ const styles = StyleSheet.create({
   },
 });
 
-const BackButton = (props) => {
-  return (
-    <View style={styles.backButton}>
-      <Text>
-        {'<'}
-      </Text>
-    </View>
-  )
+@inject('navState') @observer
+class BackButton extends React.Component {
+  render() {
+    if (!this.props.navState.activeNode.previous) {
+      return <View style={styles.backButton} />;
+    }
+
+    return (
+      <View style={styles.backButton}>
+        <Button title={'<'} onPress={this.props.navState.pop} />
+      </View>
+    );
+  }
 }
 
 const Title = (props) => {

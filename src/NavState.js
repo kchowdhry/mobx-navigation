@@ -1,4 +1,4 @@
-import { action, computed, observable } from 'mobx';
+import { Atom, action, computed, observable } from 'mobx';
 import React from 'react';
 import { Animated } from 'react-native';
 
@@ -19,6 +19,8 @@ import { Animated } from 'react-native';
 const INSTANCE_FREE_WATERMARK = 20;
 
 class InstancePool {
+  // Mobx observable maps do not allow object keys so we make the instance pool a custom observable
+  atom = new Atom('Nav instance pool');
   // Map from string or node to object with instance, refcount, and key
   nodes = new Map();
   // Set of keys that are currently orphaned
@@ -27,6 +29,7 @@ class InstancePool {
   counter: number = 0;
 
   instances(): Array<React.Component> {
+    this.atom.reportObserved();
     const onscreen = [];
     const offscreen = [];
     this.nodes.forEach((element) => {
@@ -55,6 +58,7 @@ class InstancePool {
       value.refCount += 1;
       instance = value.instance;
     } else {
+      this.atom.reportChanged();
       const navProps = (node.component.navConfig && node.component.navConfig.initNavProps) ?
         node.component.navConfig.initNavProps(node.props) : null;
       instance = node.createInstance(navProps);
@@ -85,6 +89,7 @@ class InstancePool {
         if (node.hint) {
           this.orphanedNodes.add(node.hint);
         } else {
+          this.atom.reportChanged();
           this.nodes.delete(id);
         }
       }
@@ -96,6 +101,7 @@ class InstancePool {
   flush() {
     this.nodes = new Map();
     this.orphanedNodes = new Set();
+    this.atom.reportChanged();
   }
 }
 
@@ -263,6 +269,10 @@ export class NavState {
   // Returns a promise that resolves when the transition to the new node has completed. In the promise
   // resolution, it is expected that the caller clean up any nodes that are now orphaned
   @action startTransition(node: NavNode): Promise<> {
+    if (!node) {
+      return Promise.reject();
+    }
+
     // Move nodes to the correct z-index as necessary
     if (this.motion === Motion.NONE) {
       node.moveToFront();
@@ -362,7 +372,7 @@ export class NavState {
     this.startTransition(node);
   }
 
-  @action pop() {
+  @action pop = () => {
     this.motion = Motion.SLIDE_OFF;
     this.startTransition(this.activeNode.previous).then(() => {
       this.activeNode.next = null;
