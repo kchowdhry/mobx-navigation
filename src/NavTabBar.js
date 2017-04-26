@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {
+  Animated,
   StyleSheet,
   View,
 } from 'react-native';
@@ -50,6 +51,37 @@ export default class NavTabBar extends React.Component {
     style: View.propTypes.style,
   };
 
+  get xform() {
+    // if both the front and the back scenes have a tab bar, simply show
+    const front = this.props.navState.front.element;
+    const back = this.props.navState.back ? this.props.navState.back.element : null;
+    if (front.tabBarVisible && (!back || !back.tabBarVisible)) {
+      // The front scene shows the tab bar and the back scene either doesn't exist or doesn't show the tab
+      // bar
+      return {
+        transform: [
+          {
+            translateX: this.props.navState.transitionValue.interpolate({
+              inputRange: [0, 1],
+              outputRange: [this.props.width, 0],
+            }),
+          },
+        ],
+      };
+    } else if (!front.tabBarVisible && (!back || !back.tabBarVisible)) {
+      // Neither the front or back scene displays the tab bar
+      return {
+        transform: [
+          {
+            translateX: 65536,
+          }
+        ]
+      };
+    }
+
+    return null;
+  }
+
   render() {
     if (React.Children.count(this.props.children) === 0) {
       return null;
@@ -59,21 +91,12 @@ export default class NavTabBar extends React.Component {
       top: this.props.height - this.props.navState.config.tabBarHeight,
     };
 
-    // Check if the active scene should hide the tab bar
-    const hide = this.props.navState.activeNode && this.props.navState.activeNode.tabBarVisible ? null : {
-      transform: [
-        {
-          translateX: 100000
-        }
-      ],
-    };
-
     return (
-      <View style={[styles.container, style, this.props.style, hide]}>
+      <Animated.View style={[styles.container, style, this.props.style, this.xform]}>
         <View style={styles.buttons}>
           {this.props.children}
         </View>
-      </View>
+      </Animated.View>
     )
   }
 }

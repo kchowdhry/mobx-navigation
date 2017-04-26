@@ -47,10 +47,6 @@ const styles = StyleSheet.create({
 @inject('navState') @observer
 class BackButton extends React.Component {
   render() {
-    if (!this.props.navState.activeNode.previous) {
-      return <View style={styles.backButton} />;
-    }
-
     return (
       <View style={styles.backButton}>
         <Button title={'<'} onPress={this.props.navState.pop} />
@@ -97,10 +93,12 @@ export default class NavBar extends React.Component {
 
     const props = { ...this.props, navProps: this.props.navProps };
 
+    const back = this.props.node && this.props.node.previous ? React.createElement(left, props) : null;
+
     return (
       <View style={[styles.container, style, this.props.style]}>
         <View style={styles.buttons}>
-          {React.createElement(left, props)}
+          {back}
           {React.createElement(center, props)}
           {React.createElement(right, props)}
         </View>

@@ -18,7 +18,8 @@ import { Animated } from 'react-native';
 // Keep this many orphaned instances around before starting to relaim scene instances in memory
 const INSTANCE_FREE_WATERMARK = 20;
 
-class InstancePool {
+class ElementPool {
+  navState: NavState;
   // Mobx observable maps do not allow object keys so we make the instance pool a custom observable
   atom = new Atom('Nav instance pool');
   // Map from string or node to object with instance, refcount, and key
@@ -26,17 +27,19 @@ class InstancePool {
   // Set of keys that are currently orphaned
   orphanedNodes = new Set();
 
-  counter: number = 0;
+  constructor(navState: NavState) {
+    this.navState = navState;
+  }
 
-  instances(): Array<React.Component> {
+  elements(): Array<React.Component> {
     this.atom.reportObserved();
     const onscreen = [];
     const offscreen = [];
     this.nodes.forEach((element) => {
       if (element.refCount > 0) {
-        if (element.node.isFront) {
+        if (element.isFront) {
           onscreen.push(element);
-        } else if (element.node.isBack) {
+        } else if (element.isBack) {
           onscreen.unshift(element);
         } else {
           offscreen.push(element);
@@ -47,29 +50,23 @@ class InstancePool {
   }
 
   // The hint is intended to be an object reference to a set of props used to define
-  retain(node: NavNode): React.Component {
+  retain(node: NavNode): NavElement {
     // The instance returned by this function will either be created inline or was cached already by a previous
     // nav node sharing the same hint as this one
-    let instance = null;
     let id = node.hint || node;
 
-    const value = this.nodes.get(id);
+    let value = this.nodes.get(id);
     if (value) {
       value.refCount += 1;
-      instance = value.instance;
+      // Because the refcount is greater than one, this element is used elsewhere so we clone it in this case
+      // instance = React.cloneElement(value.instance);
     } else {
       this.atom.reportChanged();
       const navProps = (node.component.navConfig && node.component.navConfig.initNavProps) ?
         node.component.navConfig.initNavProps(node.props) : null;
-      instance = node.createInstance(navProps);
-      this.counter += 1;
-      this.nodes.set(id, {
-        refCount: 1,
-        instance,
-        key: this.counter,
-        node,
-        navProps,
-      });
+      const instance = node.createInstance(navProps);
+      value = new NavElement(this.navState, instance, navProps, node.component.navConfig);
+      this.nodes.set(id, value);
     }
 
     if (node.hint) {
@@ -77,7 +74,7 @@ class InstancePool {
       this.orphanedNodes.delete(node.hint);
     }
 
-    return instance;
+    return value;
   }
 
   release(node: NavNode) {
@@ -111,11 +108,58 @@ export const Motion = {
   SLIDE_OFF: 2,
 };
 
-export const Position = {
-  FRONT: 0,
-  BACK: 1,
-  OFFSCREEN: 2,
-};
+const elementCount = 1;
+
+export class NavElement {
+  refCount: number = 1;
+  navState: NavState;
+  instance: React.Component;
+  key: number;
+  navProps: object;
+  navConfig: object;
+
+  constructor(navState, instance, navProps, navConfig) {
+    this.navState = navState;
+    this.instance = instance;
+    this.navProps = navProps;
+    this.navConfig = navConfig;
+    this.key = elementCount;
+    elementCount += 1;
+  }
+
+  get tabBarVisible(): boolean {
+    return this.navConfig && this.navConfig.tabBarVisible;
+  }
+
+  get navBarVisible(): boolean {
+    return this.navConfig && this.navConfig.navBarVisible;
+  }
+
+  get cardStyle(): Object {
+    const style = {};
+    if (this.navConfig) {
+      if (this.navBarVisible && !this.navConfig.navBarTransparent) {
+        style.marginTop = this.navState.config.navBarHeight;
+      }
+      if (this.tabBarVisible && !this.navConfig.tabBarTransparent) {
+        style.marginBottom = this.navState.config.tabBarHeight;
+      }
+    }
+    return style;
+  }
+
+  get isFront(): boolean {
+    return this.navState.front.element === this;
+  }
+
+  get isBack(): boolean {
+    return this.navState.back && this.navState.back.element === this;
+  }
+
+  get isOffscreen(): boolean {
+    return !this.isFront && !this.isBack;
+  }
+}
 
 export class NavNode {
   // Back reference to root object
@@ -124,9 +168,10 @@ export class NavNode {
   previous: NavNode;
   @observable _next: NavNode;
 
-  instance: React.Component;
+  element: NavElement;
 
-  @observable position: number = Position.OFFSCREEN;
+  // Created by scenes to reconcile identical content to be shared across nav nodes
+  _hint: string = null;
 
   get next() {
     return this._next;
@@ -136,7 +181,7 @@ export class NavNode {
     // All nodes after this one must be orphaned
     let next = this._next;
     while (next) {
-      this.navState.instancePool.release(next);
+      this.navState.elementPool.release(next);
       next = next.next;
     }
     this._next = newNext;
@@ -146,10 +191,19 @@ export class NavNode {
   @observable props;
 
   get hint() {
-    if (!this.props) {
-      return null;
+    if (this._hint) {
+      return this._hint;
     }
-    return this.props.navHint;
+
+    if (this.component.navConfig) {
+      if (typeof this.component.navConfig.cacheHint === 'function') {
+        this._hint = this.component.navConfig.cacheHint(this.props);
+      } else {
+        this._hint = this.component.navConfig.cacheHint;
+      }
+    }
+
+    return this._hint;
   }
 
   // Configuration may be overridden on a specific instance of a component
@@ -162,7 +216,7 @@ export class NavNode {
     this.navState = navState;
     this.component = component;
     this.props = props;
-    this.instance = navState.instancePool.retain(this);
+    this.element = navState.elementPool.retain(this);
   }
 
   @computed get tail() {
@@ -180,55 +234,10 @@ export class NavNode {
       ...this.props
     });
   }
-
-  get isFront() {
-    return this.position === Position.FRONT;
-  }
-
-  moveToFront() {
-    this.position = Position.FRONT;
-  }
-
-  get isBack() {
-    return this.position === Position.BACK;
-  }
-
-  moveToBack() {
-    this.position = Position.BACK;
-  }
-
-  get isOffscreen() {
-    return this.position === Position.OFFSCREEN;
-  }
-
-  moveOffscreen() {
-    this.position = Position.OFFSCREEN;
-  }
-
-  get tabBarVisible(): boolean {
-    return this.component.navConfig && this.component.navConfig.tabBarVisible;
-  }
-
-  get navBarVisible(): boolean {
-    return this.component.navConfig && this.component.navConfig.navBarVisible;
-  }
-
-  get cardStyle(): Object {
-    const style = {};
-    if (this.component.navConfig) {
-      if (this.navBarVisible && !this.component.navConfig.navBarTransparent) {
-        style.marginTop = this.navState.config.navBarHeight;
-      }
-      if (this.tabBarVisible && !this.component.navConfig.tabBarTransparent) {
-        style.marginBottom = this.navState.config.tabBarHeight;
-      }
-    }
-    return style;
-  }
 }
 
 export class NavState {
-  instancePool: InstancePool = new InstancePool();
+  elementPool: ElementPool = new ElementPool(this);
 
   rootNode: NavNode;
 
@@ -242,7 +251,8 @@ export class NavState {
   // }
   config: Object;
 
-  @observable activeNode;
+  @observable front: NavNode = null;
+  @observable back: NavNode = null;
   @observable activeTab: string = '';
 
   // These two observables are flags that, when set, being a transition of a scene sliding onto the
@@ -251,12 +261,6 @@ export class NavState {
 
   @observable transitionValue; // React.Native animated value between 0 and 1
 
-  // tabs correspond to a map from tab id to an object of the form
-  // {
-  //   component: React.Component,
-  //   props: object
-  // }
-  // If a scene advertises that it has a tab affinity
   constructor(config, initialScene: React.Component, initialSceneProps: Object) {
     this.rootNode = new NavNode(this, initialScene, initialSceneProps);
 
@@ -275,13 +279,13 @@ export class NavState {
 
     // Move nodes to the correct z-index as necessary
     if (this.motion === Motion.NONE) {
-      node.moveToFront();
+      this.front = node;
+      this.back = null;
     } else if (this.motion === Motion.SLIDE_ON) {
-      this.activeNode.moveToBack();
-      node.moveToFront();
+      this.back = this.front;
+      this.front = node;
     } else if (this.motion === Motion.SLIDE_OFF) {
-      this.activeNode.moveToFront();
-      node.moveToBack();
+      this.back = node;
     }
 
     // TODO custom callbacks
@@ -310,10 +314,10 @@ export class NavState {
   }
 
   @action endTransition = (node) => {
-    if (this.activeNode) {
-      this.activeNode.moveOffscreen();
-    }
-    this.activeNode = node;
+    this.front = node;
+    this.transitionValue = new Animated.Value(1);
+    this.back = null;
+    this.motion = Motion.NONE;
   }
 
   // Nav tab configuration:
@@ -374,19 +378,19 @@ export class NavState {
 
   @action pop = () => {
     this.motion = Motion.SLIDE_OFF;
-    this.startTransition(this.activeNode.previous).then(() => {
-      this.activeNode.next = null;
+    this.startTransition(this.front.previous).then(() => {
+      this.front.next = null;
     });
   }
 
   @action replace(scene, props) {
-    const currentActive = this.activeNode;
+    const currentActive = this.front;
     const newActive = new NavNode(this, scene, props);
     newActive.next = currentActive.next;
     newActive.previous = currentActive.previous;
     this.motion = Motion.NONE;
     this.startTransition(newActive).then(() => {
-      this.instancePool.release(currentActive);
+      this.elementPool.release(currentActive);
     });
   }
 
@@ -402,7 +406,7 @@ export class NavState {
       this.motion = Motion.NONE;
       const root = this.tabNodes.get(name);
 
-      if (root.tabConfig.disableQuickReset) {
+      if (root.tabConfig.disableQuickReset || this.front === root) {
         // Exit early if this is already the active tab and quick reset is disabled
         return;
       }

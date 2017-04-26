@@ -53,7 +53,7 @@ export default class NavContainer extends React.Component {
   }
 
   cards() {
-    return this.navState.instancePool.instances().map(
+    return this.navState.elementPool.elements().map(
       element => <NavCard key={element.key} element={element} height={this.height} width={this.width} />);
   }
 
@@ -62,7 +62,7 @@ export default class NavContainer extends React.Component {
       <Provider navState={this.navState}>
         <View style={{flex: 1}}>
           {this.cards()}
-          <NavTabBar style={this.props.tabStyle} height={this.height}>
+          <NavTabBar style={this.props.tabStyle} height={this.height} width={this.width}>
             {this.props.children}
           </NavTabBar>
         </View>

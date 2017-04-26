@@ -7,6 +7,7 @@ import {
 
 import { NavContainer, NavTab } from '../..';
 
+import CachedScene from './CachedScene';
 import ComplexScene from './ComplexScene';
 
 const TestScene = (props) => {
@@ -109,9 +110,19 @@ const Tab2 = (props) => {
     props.navState.push(Tab2Scene1);
   };
 
+  const onPress2 = () => {
+    props.navState.push(CachedScene, { key: 'key1' });
+  };
+
+  const onPress3 = () => {
+    props.navState.push(CachedScene, { key: 'key2' });
+  };
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white', marginTop: 20 }}>
       <Button title={'Tab 2'} onPress={onPress} />
+      <Button title={'Cached scene'} onPress={onPress2} />
+      <Button title={'Different scene'} onPress={onPress3} />
     </View>
   );
 }
@@ -144,10 +155,15 @@ const Tab3 = (props) => {
     props.navState.push(ComplexScene, { title: 'start' });
   }
 
+  const onPress3 = () => {
+    props.navState.push(CachedScene, { key: 'key1' });
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white', marginTop: 20 }}>
       <Button title={'Tab 3'} onPress={onPress} />
       <Button title={'Complex'} onPress={onPress2} />
+      <Button title={'Cached scene'} onPress={onPress3} />
     </View>
   );
 }

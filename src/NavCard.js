@@ -5,7 +5,7 @@ import {
   View
 } from 'react-native';
 import PropTypes from 'prop-types';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 
 import NavBar from './NavBar';
 import { Motion } from './NavState';
@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
   }
 });
 
-@observer
+@inject('navState') @observer
 export default class NavCard extends React.Component {
   static propTypes = {
     element: PropTypes.object,
@@ -34,25 +34,19 @@ export default class NavCard extends React.Component {
     width: PropTypes.number,
   };
 
-  componentWillMount() {
-    if (this.node.config && this.node.config.initNavProps) {
-      this.navProps = this.node.config.initNavProps(this.props);
-    }
-  }
-
   get xform() {
-    if (this.node.isFront) {
+    if (this.props.element.isFront) {
       return {
         transform: [
           {
-            translateX: this.node.navState.transitionValue.interpolate({
+            translateX: this.props.navState.transitionValue.interpolate({
               inputRange: [0, 1],
               outputRange: [this.props.width, 0],
             }),
           },
         ],
       };
-    } else if (this.node.isOffscreen) {
+    } else if (this.props.element.isOffscreen) {
       return {
         transform: [
           {
@@ -66,19 +60,15 @@ export default class NavCard extends React.Component {
   }
 
   get navConfig() {
-    return this.node.component.navConfig;
+    return this.props.element.navConfig;
   }
 
   get navProps() {
     return this.props.element.navProps;
   }
 
-  get node() {
-    return this.props.element.node;
-  }
-
   get navBar() {
-    if (!this.node.navBarVisible) {
+    if (!this.props.element.navBarVisible) {
       return null;
     }
 
@@ -91,9 +81,17 @@ export default class NavCard extends React.Component {
       right = this.navConfig.navBarRight;
     }
 
+    let node = null;
+    if (this.props.element.isFront) {
+      node = this.props.navState.front;
+    } else if (this.props.element.isBack) {
+      node = this.props.navState.back;
+    }
+
     return (
       <NavBar
         height={this.props.height}
+        node={node}
         left={left}
         center={center}
         right={right}
@@ -105,7 +103,7 @@ export default class NavCard extends React.Component {
   render() {
     return (
       <Animated.View style={[styles.card, this.xform]}>
-        <View style={[styles.card, this.node.cardStyle]}>
+        <View style={[styles.card, this.props.element.cardStyle]}>
           {this.props.element.instance}
         </View>
         {this.navBar}
