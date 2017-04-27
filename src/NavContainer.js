@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Dimensions,
   Platform,
+  StyleSheet,
   View
 } from 'react-native';
 import { observer, Provider } from 'mobx-react';
@@ -20,10 +21,65 @@ const TransitionState = {
   POP: 2,
 };
 
-const defaultConfig = {
+const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : 0;
+
+export const defaultConfig = {
+  navBarVisible: false,
+  tabBarVisible: false,
+  cardStyle: {
+    bottom: 0,
+    left: 0,
+    right: 0,
+    top: STATUSBAR_HEIGHT,
+    position: 'absolute',
+    backgroundColor: 'white',
+  },
   navBarStyle: {
-    // height: Platform.OS === 'ios' ? 68 : 60,
+    backgroundColor: 'white',
+    paddingTop: STATUSBAR_HEIGHT,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#828287',
     height: 68,
+  },
+  navBarCenterStyle: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: STATUSBAR_HEIGHT,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  navBarLeftStyle: {
+    position: 'absolute',
+    justifyContent: 'center',
+    paddingTop: STATUSBAR_HEIGHT,
+    width: 100,
+    top: 0,
+    left: 0,
+    bottom: 0,
+    paddingLeft: 15,
+  },
+  navBarRightStyle: {
+    position: 'absolute',
+    justifyContent: 'center',
+    paddingTop: STATUSBAR_HEIGHT,
+    width: 100,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    paddingRight: 15,
+  },
+  navBarTitleStyle: {
+    alignItems: 'center',
+  },
+  navBarSubtitleStyle: {
+
   },
   tabBarStyle: {
     height: 50,
@@ -46,9 +102,10 @@ export default class NavContainer extends React.Component {
 
   constructor(props) {
     super(props);
-    const config = {...defaultConfig, ...props};
+    const config = { ...defaultConfig, ...props };
 
     this.navState = new NavState(config);
+    Log.debug('Initializing nav container with configuration: ', config);
     const { height, width } = Dimensions.get('window');
     this.width = width;
     this.height = height;
@@ -74,7 +131,7 @@ export default class NavContainer extends React.Component {
   render() {
     return (
       <Provider navState={this.navState}>
-        <View style={{flex: 1}}>
+        <View style={{ flex: 1 }}>
           {this.cards()}
           <NavTabBar style={this.props.tabStyle} height={this.height} width={this.width}>
             {this.props.children}

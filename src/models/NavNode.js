@@ -25,7 +25,7 @@ export default class NavNode {
     if (newNext && newNext.isUnique) {
       const prev = current;
       while (prev) {
-        if (prev.componentName === newNext.componentName) {
+        if (prev.component === newNext.component) {
           current = prev.previous;
           break;
         }

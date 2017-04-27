@@ -62,12 +62,12 @@ export class NavState {
 
     Log.setLogLevel(config.logLevel);
 
+    this.config = config;
+
     this.rootNode = new NavNode(this, config.initialScene, config.initialProps);
 
     this.transitionValue = new Animated.Value(1);
     this.startTransition(this.rootNode);
-
-    this.config = config;
   }
 
   // Returns a promise that resolves when the transition to the new node has completed. In the promise

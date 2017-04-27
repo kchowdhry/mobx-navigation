@@ -25,7 +25,7 @@ const TestScene = (props) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'orange', marginTop: 20 }}>
+    <View style={{ flex: 1, backgroundColor: 'orange' }}>
       <Button title={props.text} onPress={onPress} />
       <Button title={'Test replace'} onPress={onPress2} />
       <Button title={'Tabs!'} onPress={onPress3} />
@@ -82,7 +82,7 @@ class Tab1 extends React.Component {
 
   render() {
     return (
-      <View style={{ flex: 1, backgroundColor: 'white', marginTop: 20 }}>
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
         <Button title={'scene 1'} onPress={this.onPress} />
         <Button title={'Tab 2 scene 1'} onPress={this.onPress2} />
       </View>
@@ -92,7 +92,7 @@ class Tab1 extends React.Component {
 
 const Tab1Scene1 = (props) => {
   return (
-    <View style={{flex: 1, backgroundColor: 'white', marginTop: 20}}>
+    <View style={{flex: 1, backgroundColor: 'white' }}>
       <Text>
         Tab 1 scene 1
       </Text>
@@ -120,7 +120,7 @@ const Tab2 = (props) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white', marginTop: 20 }}>
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
       <Button title={'Tab 2'} onPress={onPress} />
       <Button title={'Cached scene'} onPress={onPress2} />
       <Button title={'Different scene'} onPress={onPress3} />
@@ -135,7 +135,7 @@ Tab2.navConfig = {
 
 const Tab2Scene1 = (props) => {
   return (
-    <View style={{flex: 1, backgroundColor: 'white', marginTop: 20}}>
+    <View style={{flex: 1, backgroundColor: 'white' }}>
       <Text>
         Tab 2 scene 1
       </Text>
@@ -144,6 +144,7 @@ const Tab2Scene1 = (props) => {
 }
 
 Tab2Scene1.navConfig = {
+  navBarVisible: true,
   tabAffinity: '2',
 };
 
@@ -161,7 +162,7 @@ const Tab3 = (props) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white', marginTop: 20 }}>
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
       <Button title={'Tab 3'} onPress={onPress} />
       <Button title={'Complex'} onPress={onPress2} />
       <Button title={'Cached scene'} onPress={onPress3} />
@@ -176,7 +177,7 @@ Tab3.navConfig = {
 
 const Tab3Scene1 = (props) => {
   return (
-    <View style={{flex: 1, backgroundColor: 'white', marginTop: 20}}>
+    <View style={{flex: 1, backgroundColor: 'white' }}>
       <Text>
         Tab 2 scene 1
       </Text>
@@ -191,7 +192,7 @@ Tab3Scene1.navConfig = {
 
 const TabCommon = (props) => {
   return (
-    <View style={{ flex: 1, backgroundColor: 'white', marginTop: 20 }}>
+    <View style={{ flex: 1, backgroundColor: 'white' }}>
       <Button title={'Tab Common'} onPress={onPress} />
     </View>
   );

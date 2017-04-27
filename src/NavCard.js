@@ -15,17 +15,6 @@ import NavBar from './NavBar';
 // in the back by the parent container.
 // If the component is inactive, it is rendered with its nav bar far outside the viewport.
 
-const styles = StyleSheet.create({
-  card: {
-    bottom: 0,
-    left: 0,
-    right: 0,
-    top: 0,
-    position: 'absolute',
-    backgroundColor: 'white',
-  }
-});
-
 @inject('navState') @observer
 export default class NavCard extends React.Component {
   static propTypes = {
@@ -59,7 +48,7 @@ export default class NavCard extends React.Component {
     return null;
   }
 
-  get navConfig() {
+  get config() {
     return this.props.element.navConfig;
   }
 
@@ -76,14 +65,9 @@ export default class NavCard extends React.Component {
       return null;
     }
 
-    let left = null;
-    let center = null;
-    let right = null;
-    if (this.navConfig) {
-      left = this.navConfig.navBarLeft;
-      center = this.navConfig.navBarCenter;
-      right = this.navConfig.navBarRight;
-    }
+    const left = this.config.navBarLeft;
+    const center = this.config.navBarCenter;
+    const right = this.config.navBarRight;
 
     let node = null;
     if (this.props.element.isFront) {
@@ -95,20 +79,25 @@ export default class NavCard extends React.Component {
     return (
       <NavBar
         height={this.props.height}
-        node={node}
+        element={this.props.element}
         left={left}
         center={center}
         right={right}
         navProps={this.navProps}
-        style={this.navConfig.navBarStyle}
+        style={this.config.navBarStyle}
+        leftStyle={this.config.navBarLeftStyle}
+        rightStyle={this.config.navBarRightStyle}
+        centerStyle={this.config.navBarCenterStyle}
+        titleStyle={this.config.navBarTitleStyle}
+        subtitleStyle={this.config.navBarSubtitleStyle}
       />
     )
   }
 
   render() {
     return (
-      <Animated.View style={[styles.card, this.xform]}>
-        <View style={[styles.card, this.cardStyle]}>
+      <Animated.View style={[StyleSheet.absoluteFill, this.xform]}>
+        <View style={[StyleSheet.absoluteFill, this.cardStyle]}>
           {this.props.element.instance}
         </View>
         {this.navBar}

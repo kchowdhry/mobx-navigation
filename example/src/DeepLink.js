@@ -6,6 +6,8 @@ import {
 } from 'react-native';
 import { observer } from 'mobx-react'
 
+import { defaultConfig } from '../..';
+
 import UniqueScene from './Unique';
 
 const SceneOne = (props) => {
@@ -39,6 +41,7 @@ SceneTwo.navConfig = {
 export default class DeepLink extends React.Component {
   static navConfig = {
     cardStyle: {
+      ...defaultConfig.cardStyle,
       backgroundColor: 'red',
     },
     navBarVisible: true,

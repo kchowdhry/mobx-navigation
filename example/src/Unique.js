@@ -8,13 +8,20 @@ import {
 
 import { observable } from 'mobx';
 
+import { defaultConfig } from '../..';
+
 class OtherScene extends React.Component {
   static navConfig = {
     navBarVisible: true,
-    tabBarVisible: true,
+    tabBarVisible: false,
     navBarStyle: {
+      ...defaultConfig.navBarStyle,
       backgroundColor: 'orange',
     },
+    cardStyle: {
+      ...defaultConfig.cardStyle,
+      backgroundColor: 'orange',
+    }
   };
 
   onPress = () => {

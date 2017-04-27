@@ -1,4 +1,9 @@
+import { Platform } from 'react-native';
 import { observable } from 'mobx';
+
+import Log from '../Logger';
+
+const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : 0;
 
 const elementCount = 1;
 
@@ -18,28 +23,28 @@ export default class NavElement {
   constructor(navState, navProps, navConfig) {
     this.navState = navState;
     this.navProps = navProps;
-    this.navConfig = navConfig;
+    console.log(navState.config);
+    this.navConfig = { ...navState.config, ...navConfig };
+    Log.trace('Nav element created with config: ', this.navConfig);
     this.key = elementCount;
     elementCount += 1;
   }
 
   get tabBarVisible(): boolean {
-    return this.navConfig && this.navConfig.tabBarVisible;
+    return this.navConfig.tabBarVisible;
   }
 
   get navBarVisible(): boolean {
-    return this.navConfig && this.navConfig.navBarVisible;
+    return this.navConfig.navBarVisible;
   }
 
   get cardStyle(): Object {
     const style = {};
-    if (this.navConfig) {
-      if (this.navBarVisible && !this.navConfig.navBarTransparent) {
-        style.marginTop = this.navState.config.navBarStyle.height;
-      }
-      if (this.tabBarVisible && !this.navConfig.tabBarTransparent) {
-        style.marginBottom = this.navState.config.tabBarStyle.height;
-      }
+    if (this.navBarVisible && !this.navConfig.navBarTransparent) {
+      style.marginTop = this.navState.config.navBarStyle.height - STATUSBAR_HEIGHT;
+    }
+    if (this.tabBarVisible && !this.navConfig.tabBarTransparent) {
+      style.marginBottom = this.navState.config.tabBarStyle.height;
     }
 
     return [style, this.navConfig.cardStyle];

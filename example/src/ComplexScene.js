@@ -50,6 +50,6 @@ export default class ComplexScene extends React.Component {
           {this.numClicks}
         </Text>
       </View>
-    )
+    );
   }
 }
