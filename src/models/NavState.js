@@ -201,7 +201,9 @@ export class NavState {
   @action replace(scene, props) {
     const currentActive = this.front;
     const newActive = new NavNode(this, scene, props);
-    currentActive.previous.next = newActive;
+    if (currentActive.previous) {
+      currentActive.previous.next = newActive;
+    }
     this.motion = Motion.NONE;
     this.startTransition(newActive);
   }

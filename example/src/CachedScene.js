@@ -19,11 +19,12 @@ export default class CachedScene extends React.Component {
     cacheHint: props => props.key,
   }
 
-  @observable counter = 0;
+  @observable counter;
 
   constructor(props) {
     super(props);
     createdCount += 1;
+    this.counter = 0;
   }
 
   componentWillShow() {
