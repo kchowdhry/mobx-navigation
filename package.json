@@ -16,8 +16,8 @@
     "react-native": "^0.43.4"
   },
   "scripts": {
-    "android": "react-native run-android --root example",
-    "ios": "react-native run-ios --root example",
+    "android": "cd example; react-native run-android",
+    "ios": "cd example; react-native run-ios",
     "start": "node node_modules/react-native/local-cli/cli.js start --projectRoots `pwd`,`pwd`/example",
     "test": "jest --coverage"
   },

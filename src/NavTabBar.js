@@ -10,7 +10,6 @@ import { inject, observer } from 'mobx-react';
 
 import PropTypes from 'prop-types';
 
-import { NavState, NavNode } from './NavState';
 import NavTab from './NavTab';
 
 const styles = StyleSheet.create({
@@ -19,13 +18,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white'
   },
   container: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
+    backgroundColor: 'white',
   },
 });
 
@@ -55,7 +54,10 @@ export default class NavTabBar extends React.Component {
     // if both the front and the back scenes have a tab bar, simply show
     const front = this.props.navState.front.element;
     const back = this.props.navState.back ? this.props.navState.back.element : null;
-    if (front.tabBarVisible && (!back || !back.tabBarVisible)) {
+    if (front.tabBarVisible && back && back.tabBarVisible) {
+      // display and do not animate
+      return null;
+    } else if (front.tabBarVisible && (!back || !back.tabBarVisible)) {
       // The front scene shows the tab bar and the back scene either doesn't exist or doesn't show the tab
       // bar
       return {
@@ -68,18 +70,16 @@ export default class NavTabBar extends React.Component {
           },
         ],
       };
-    } else if (!front.tabBarVisible && (!back || !back.tabBarVisible)) {
-      // Neither the front or back scene displays the tab bar
-      return {
-        transform: [
-          {
-            translateX: 65536,
-          }
-        ]
-      };
     }
 
-    return null;
+    // Neither the front or back scene displays the tab bar
+    return {
+      transform: [
+        {
+          translateX: 65536,
+        }
+      ]
+    };
   }
 
   render() {

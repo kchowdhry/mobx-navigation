@@ -14,6 +14,7 @@ import PropTypes from 'prop-types';
 const styles = StyleSheet.create({
   button: {
     flex: 1,
+    flexDirection: 'column',
     height: 50, // TODO
     justifyContent: 'center',
     alignItems: 'stretch',

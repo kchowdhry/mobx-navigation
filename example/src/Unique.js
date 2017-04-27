@@ -6,10 +6,15 @@ import {
   View,
 } from 'react-native';
 
+import { observable } from 'mobx';
+
 class OtherScene extends React.Component {
   static navConfig = {
     navBarVisible: true,
     tabBarVisible: true,
+    navBarStyle: {
+      backgroundColor: 'orange',
+    },
   };
 
   onPress = () => {
@@ -41,6 +46,11 @@ export default class UniqueScene extends React.Component {
     // top of the stack and if it encounters a screen with the same component
     // type, it will replace it
     unique: true,
+    initNavProps: (props) => {
+      return observable({
+        title: 'Unique scene',
+      });
+    },
   };
 
   onPress = () => {

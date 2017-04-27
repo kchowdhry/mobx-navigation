@@ -1,13 +1,14 @@
 import React from 'react';
 import {
   Dimensions,
+  Platform,
   View
 } from 'react-native';
 import { observer, Provider } from 'mobx-react';
 import { autorun, observable } from 'mobx';
 import PropTypes from 'prop-types';
 
-import { NavState } from './NavState';
+import { NavState } from './models/NavState';
 import NavTabBar from './NavTabBar';
 import NavCard from './NavCard';
 
@@ -20,8 +21,13 @@ const TransitionState = {
 };
 
 const defaultConfig = {
-  navBarHeight: 68,
-  tabBarHeight: 50,
+  navBarStyle: {
+    // height: Platform.OS === 'ios' ? 68 : 60,
+    height: 68,
+  },
+  tabBarStyle: {
+    height: 50,
+  },
   logLevel: Log.Level.INFO,
 }
 
@@ -29,9 +35,8 @@ const defaultConfig = {
 @observer
 export default class NavContainer extends React.Component {
   static propTypes = {
-    navBarHeight: PropTypes.number,
+    cardStyle: View.propTypes.style,
     navBarStyle: View.propTypes.style,
-    tabBarHeight: PropTypes.number,
     tabStyle: View.propTypes.style,
     logLevel: PropTypes.number,
   };

@@ -8,7 +8,6 @@ import PropTypes from 'prop-types';
 import { inject, observer } from 'mobx-react';
 
 import NavBar from './NavBar';
-import { Motion } from './NavState';
 
 // This component encapsulates the transition of the scene component with an optional nav bar
 // If the component is active, it is rendered with its nav bar in the main view as part of the transition
@@ -23,6 +22,7 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     position: 'absolute',
+    backgroundColor: 'white',
   }
 });
 
@@ -63,6 +63,10 @@ export default class NavCard extends React.Component {
     return this.props.element.navConfig;
   }
 
+  get cardStyle() {
+    return this.props.element.cardStyle;
+  }
+
   get navProps() {
     return this.props.element.navProps;
   }
@@ -96,6 +100,7 @@ export default class NavCard extends React.Component {
         center={center}
         right={right}
         navProps={this.navProps}
+        style={this.navConfig.navBarStyle}
       />
     )
   }
@@ -103,7 +108,7 @@ export default class NavCard extends React.Component {
   render() {
     return (
       <Animated.View style={[styles.card, this.xform]}>
-        <View style={[styles.card, this.props.element.cardStyle]}>
+        <View style={[styles.card, this.cardStyle]}>
           {this.props.element.instance}
         </View>
         {this.navBar}

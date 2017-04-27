@@ -38,6 +38,9 @@ SceneTwo.navConfig = {
 @observer
 export default class DeepLink extends React.Component {
   static navConfig = {
+    cardStyle: {
+      backgroundColor: 'red',
+    },
     navBarVisible: true,
     tabBarVisible: true,
   };
