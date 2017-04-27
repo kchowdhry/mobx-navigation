@@ -1,4 +1,4 @@
-import { Atom, action, computed, observable } from 'mobx';
+import { Atom, action, computed, observable, when } from 'mobx';
 import React from 'react';
 import { Animated } from 'react-native';
 import Log from './Logger';
@@ -67,8 +67,8 @@ class ElementPool {
       this.atom.reportChanged();
       const navProps = (node.component.navConfig && node.component.navConfig.initNavProps) ?
         node.component.navConfig.initNavProps(node.props) : null;
-      const instance = node.createInstance(navProps);
-      value = new NavElement(this.navState, instance, navProps, node.component.navConfig);
+      value = new NavElement(this.navState, navProps, node.component.navConfig);
+      value.instance = node.createInstance(navProps, value);
       this.elements.set(id, value);
     }
 
@@ -125,16 +125,20 @@ export const Motion = {
 const elementCount = 1;
 
 export class NavElement {
+  // NOTE: The nav element must not contain any back references to nav nodes so as not
+  // to introduce a circular dependency
   refCount: number = 1;
   navState: NavState;
-  instance: React.Component;
   key: number;
   navProps: object;
   navConfig: object;
 
-  constructor(navState, instance, navProps, navConfig) {
+  // The instance and ref are set shortly after the NavElement is constructed
+  instance: object;
+  @observable ref: object = null;
+
+  constructor(navState, navProps, navConfig) {
     this.navState = navState;
-    this.instance = instance;
     this.navProps = navProps;
     this.navConfig = navConfig;
     this.key = elementCount;
@@ -192,13 +196,31 @@ export class NavNode {
   }
 
   set next(newNext: NavNode) {
-    // All nodes after this one must be orphaned
-    let next = this._next;
-    while (next) {
-      this.navState.elementPool.release(next);
-      next = next.next;
+    // First, determine if this node is truly the one we intend on inserting newNext after.
+    // In the event that the new node is marked "unique," we must search the current stack to ensure
+    // that exactly one instance of it exists at a time.
+    let current = this;
+    if (newNext && newNext.isUnique) {
+      const prev = current;
+      while (prev) {
+        if (prev.componentName === newNext.componentName) {
+          current = prev.previous;
+          break;
+        }
+        prev = prev.previous;
+      }
     }
-    this._next = newNext;
+
+    // All nodes after this one must be orphaned
+    let nextNode = current._next;
+    while (nextNode) {
+      this.navState.elementPool.release(nextNode);
+      nextNode = nextNode._next;
+    }
+    current._next = newNext;
+    if (newNext) {
+      newNext.previous = current;
+    }
   }
 
   @observable component;
@@ -224,6 +246,10 @@ export class NavNode {
     return this._hint;
   }
 
+  get isUnique() {
+    return this.component.navConfig && this.component.navConfig.unique;
+  }
+
   // Configuration may be overridden on a specific instance of a component
   @observable config;
 
@@ -245,11 +271,24 @@ export class NavNode {
     return this.next.tail;
   }
 
-  createInstance(navProps) {
+  createInstance(navProps, element) {
+    // Careful! We want to store a ref to the underlying element but we have to be careful not to
+    // prevent the caller from grabbing the ref as well
+    // The conditional expression here ensures we don't try to grab the ref of a stateless component
+    // as this is disallowed in React
+    const ref = this.component.prototype.render ?
+      (r) => {
+        if (typeof this.props.ref === 'function') {
+          this.props.ref(r);
+        }
+        element.ref = r;
+      } : undefined;
+
     return React.createElement(this.component, {
       navState: this.navState,
       navProps,
-      ...this.props
+      ...this.props,
+      ref,
     });
   }
 }
@@ -279,6 +318,10 @@ export class NavState {
 
   @observable transitionValue; // React.Native animated value between 0 and 1
 
+  // If this flag is set, all transitions only modify the node data structure and do not perform any
+  // actual operations on the scene animations themselves
+  multistepInProgress: boolean = false;
+
   // See propTypes and default config in NavContainer
   constructor(config) {
     if (!config.initialScene) {
@@ -302,6 +345,17 @@ export class NavState {
     if (!node) {
       Log.error(`Attempting to transition to empty node`);
       return Promise.reject();
+    }
+
+    if (this.multistepInProgress) {
+      // We're in the middle of executing a multistep transactional transition
+      return Promise.resolve();
+    }
+
+    if (node.component.prototype.componentWillShow) {
+      // We perform the componentWillShow as a mobx reaction because it isn't immediately available
+      when('node ref available', () => !!node.element.ref,
+        () => node.element.ref.componentWillShow());
     }
 
     // Move nodes to the correct z-index as necessary
@@ -342,6 +396,9 @@ export class NavState {
 
   @action endTransition = (node) => {
     Log.trace(`Transitioned to node ${node.componentName}/${node.hint || ''}`);
+    if (node.element.ref && node.element.ref.componentDidShow) {
+      node.element.ref.componentDidShow();
+    }
     this.front = node;
     this.transitionValue = new Animated.Value(1);
     this.back = null;
@@ -392,7 +449,6 @@ export class NavState {
     }
 
     tail.next = node;
-    node.previous = tail;
 
     if (targetTab !== this.activeTab) {
       this.motion = Motion.NONE;
@@ -414,12 +470,9 @@ export class NavState {
   @action replace(scene, props) {
     const currentActive = this.front;
     const newActive = new NavNode(this, scene, props);
-    newActive.next = currentActive.next;
-    newActive.previous = currentActive.previous;
+    currentActive.previous.next = newActive;
     this.motion = Motion.NONE;
-    this.startTransition(newActive).then(() => {
-      this.elementPool.release(currentActive);
-    });
+    this.startTransition(newActive);
   }
 
   @action tabs() {
@@ -442,10 +495,24 @@ export class NavState {
       this.startTransition(root).then(() => {
         root.next = null;
       });
-      // TODO: handle orphaning
     } else {
       this.activeTab = name;
       this.startTransition(this.tabNodes.get(name).tail);
     }
+  }
+
+  // This function performs a multi-step transition where all the steps are functions
+  // that execute the various transition types above
+  @action multistep(steps: Array = []) {
+    if (steps.length === 0) {
+      Log.error('Attempted to perform a multistep transition with no steps');
+      return;
+    }
+    this.multistepInProgress = true;
+    for (let i = 0; i < steps.length - 1; ++i) {
+      steps[i]();
+    }
+    this.multistepInProgress = false;
+    steps[steps.length - 1]();
   }
 }

@@ -9,6 +9,7 @@ import { NavContainer, NavTab } from '../..';
 
 import CachedScene from './CachedScene';
 import ComplexScene from './ComplexScene';
+import DeepLink from './DeepLink';
 
 const TestScene = (props) => {
   const onPress = () => {
@@ -207,6 +208,7 @@ export default class Root extends React.Component {
         <NavTab initialScene={Tab1} name={'1'} isInitial />
         <NavTab initialScene={Tab2} name={'2'} />
         <NavTab initialScene={Tab3} name={'3'} initialProps={{ color: 'red' }} />
+        <NavTab initialScene={DeepLink} name={'4'} />
       </NavContainer>
     )
   }

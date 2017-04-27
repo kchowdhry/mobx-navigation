@@ -26,6 +26,14 @@ export default class CachedScene extends React.Component {
     createdCount += 1;
   }
 
+  componentWillShow() {
+    console.log('Cached scene coming online');
+  }
+
+  componentDidShow() {
+    console.log('Cached scene came online');
+  }
+
   render() {
     return (
       <View style={{flex: 1, backgroundColor: 'white'}}>
