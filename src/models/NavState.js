@@ -168,7 +168,7 @@ export class NavState {
     }
   }
 
-  @action push(scene, props) {
+  @action push = (scene, props) => {
     const config = scene.navConfig || {};
     const node = new NavNode(this, scene, props);
 
@@ -205,22 +205,25 @@ export class NavState {
 
   @action pop = () => {
     this.motion = Motion.SLIDE_OFF;
-    this.startTransition(this.front.previous).then(() => {
-      this.front.next = null;
+    return new Promise((resolve) => {
+      this.startTransition(this.front.previous).then(() => {
+        this.front.next = null;
+        resolve();
+      });
     });
   }
 
-  @action replace(scene, props) {
+  @action replace = (scene, props) => {
     const currentActive = this.front;
     const newActive = new NavNode(this, scene, props);
     if (currentActive.previous) {
       currentActive.previous.next = newActive;
     }
     this.motion = Motion.NONE;
-    this.startTransition(newActive);
+    return this.startTransition(newActive);
   }
 
-  @action tabs() {
+  @action tabs = () => {
     this.tabConfigs.forEach((config, name) => {
       if (!this.tabNodes.has(name)) {
         this.addTab(config);
@@ -230,17 +233,17 @@ export class NavState {
     // Calling this function causes a replacement transition to the scene associated to the initial tab
     this.activeTab = this.initialTab.tabConfig.name;
     this.motion = Motion.NONE;
-    this.startTransition(this.initialTab);
+    return this.startTransition(this.initialTab);
   }
 
-  @action tab(name: string) {
+  @action tab = (name: string) => {
     if (this.activeTab === name) {
       this.motion = Motion.NONE;
       const root = this.tabNodes.get(name);
 
       if (root.tabConfig.disableQuickReset || this.front === root) {
         // Exit early if this is already the active tab and quick reset is disabled
-        return;
+        return Promise.reject();
       }
 
       this.startTransition(root).then(() => {
@@ -248,15 +251,16 @@ export class NavState {
       });
     } else if (this.tabNodes.has(name)) {
       this.activeTab = name;
-      this.startTransition(this.tabNodes.get(name).tail);
+      return this.startTransition(this.tabNodes.get(name).tail);
     } else {
       Log.error(`Attempted to navigate to nonexistant tab ${name}`);
+      return Promise.reject();
     }
   }
 
   // This function performs a multi-step transition where all the steps are functions
   // that execute the various transition types above
-  @action multistep(steps: Array = []) {
+  @action multistep = (steps: Array = []) => {
     if (steps.length === 0) {
       Log.error('Attempted to perform a multistep transition with no steps');
       return;
@@ -268,6 +272,6 @@ export class NavState {
       }
     });
     this.multistepInProgress = false;
-    steps[steps.length - 1]();
+    return steps[steps.length - 1]();
   }
 }
