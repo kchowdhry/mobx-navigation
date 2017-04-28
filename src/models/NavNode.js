@@ -72,9 +72,6 @@ export default class NavNode {
     return this.component.navConfig && this.component.navConfig.unique;
   }
 
-  // Configuration may be overridden on a specific instance of a component
-  @observable config;
-
   // If this scene is used as the root of a tab, the configuration governing the tab are housed here
   @observable tabConfig;
 

@@ -54,7 +54,7 @@ export default class NavTab extends React.Component {
   };
 
   componentWillMount() {
-    this.props.navState.addTab(this.props);
+    this.props.navState.addTabConfig(this.props);
   }
 
   onPress = () => {

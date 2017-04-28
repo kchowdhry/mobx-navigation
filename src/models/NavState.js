@@ -1,5 +1,5 @@
 import { action, observable, untracked, when } from 'mobx';
-import { Animated } from 'react-native';
+import { Animated, StatusBar } from 'react-native';
 
 import ElementPool from './ElementPool';
 import NavNode from './NavNode';
@@ -29,6 +29,7 @@ export class NavState {
 
   rootNode: NavNode;
 
+  tabConfigs: Map<string, Object> = new Map();
   tabNodes: Map<string, Object> = new Map();
 
   initialTab: NavNode;
@@ -38,6 +39,8 @@ export class NavState {
   //   navBarHeight: number,
   // }
   config: Object;
+
+  currentStatusBarStyle = 'default';
 
   @observable front: NavNode = null;
   @observable back: NavNode = null;
@@ -130,6 +133,11 @@ export class NavState {
     if (node.element.ref && node.element.ref.componentDidShow) {
       node.element.ref.componentDidShow();
     }
+    if (node.element.navConfig.statusBarStyle !== this.currentStatusBarStyle) {
+      StatusBar.setBarStyle(node.element.navConfig.statusBarStyle);
+      this.currentStatusBarStyle = node.element.navConfig.statusBarStyle;
+    }
+
     this.front = node;
     this.transitionValue = new Animated.Value(1);
     this.back = null;
@@ -147,6 +155,10 @@ export class NavState {
   // }
   // This function is not meant to be called directly but is invoked automatically by NavTab components
   // used as children of the NavContainer
+  addTabConfig(tabConfig: Object) {
+    this.tabConfigs.set(tabConfig.name, tabConfig);
+  }
+
   addTab(tabConfig: Object) {
     const tab = new NavNode(this, tabConfig.initialScene, tabConfig.initialProps);
     tab.tabConfig = tabConfig;
@@ -209,6 +221,12 @@ export class NavState {
   }
 
   @action tabs() {
+    this.tabConfigs.forEach((config, name) => {
+      if (!this.tabNodes.has(name)) {
+        this.addTab(config);
+      }
+    });
+
     // Calling this function causes a replacement transition to the scene associated to the initial tab
     this.activeTab = this.initialTab.tabConfig.name;
     this.motion = Motion.NONE;
@@ -228,9 +246,11 @@ export class NavState {
       this.startTransition(root).then(() => {
         root.next = null;
       });
-    } else {
+    } else if (this.tabNodes.has(name)) {
       this.activeTab = name;
       this.startTransition(this.tabNodes.get(name).tail);
+    } else {
+      Log.error(`Attempted to navigate to nonexistant tab ${name}`);
     }
   }
 

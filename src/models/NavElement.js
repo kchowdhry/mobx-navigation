@@ -41,10 +41,10 @@ export default class NavElement {
   get cardStyle(): Object {
     const style = {};
     if (this.navBarVisible && !this.navConfig.navBarTransparent) {
-      style.marginTop = this.navState.config.navBarStyle.height - STATUSBAR_HEIGHT;
+      style.marginTop = this.navConfig.navBarStyle.height - STATUSBAR_HEIGHT;
     }
     if (this.tabBarVisible && !this.navConfig.tabBarTransparent) {
-      style.marginBottom = this.navState.config.tabBarStyle.height;
+      style.marginBottom = this.navConfig.tabBarStyle.height;
     }
 
     return [style, this.navConfig.cardStyle];

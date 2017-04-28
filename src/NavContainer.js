@@ -81,6 +81,7 @@ export const defaultConfig = {
   navBarSubtitleStyle: {
 
   },
+  statusBarStyle: 'default', // One of 'default' or stylesheet object
   tabBarStyle: {
     height: 50,
   },
