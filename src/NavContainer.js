@@ -46,6 +46,8 @@ export const defaultConfig = {
     borderBottomColor: '#828287',
     height: 68,
   },
+  navBarCenter: null,
+  navBarCenterProps: null,
   navBarCenterStyle: {
     position: 'absolute',
     alignItems: 'center',
@@ -56,6 +58,8 @@ export const defaultConfig = {
     right: 0,
     bottom: 0,
   },
+  navBarLeft: null,
+  navBarLeftProps: null,
   navBarLeftStyle: {
     position: 'absolute',
     justifyContent: 'center',
@@ -66,6 +70,8 @@ export const defaultConfig = {
     bottom: 0,
     paddingLeft: 15,
   },
+  navBarRight: null,
+  navBarRightProps: null,
   navBarRightStyle: {
     position: 'absolute',
     justifyContent: 'center',

@@ -40,13 +40,13 @@ export default class NavElement {
   get cardStyle(): Object {
     const style = {};
     if (this.navBarVisible && !this.navConfig.navBarTransparent) {
-      style.paddingTop = this.navConfig.navBarStyle.height - STATUSBAR_HEIGHT;
+      style.paddingTop = this.navConfig.navBarStyle.height;
     }
     if (this.tabBarVisible && !this.navConfig.tabBarTransparent) {
       style.paddingBottom = this.navConfig.tabBarStyle.height;
     }
 
-    return [style, this.navConfig.cardStyle];
+    return [this.navConfig.cardStyle, style];
   }
 
   get isFront(): boolean {

@@ -15,7 +15,7 @@ import { inject, observer } from 'mobx-react';
 class BackButton extends React.Component {
   render() {
     const inner = this.props.left ?
-      React.createElement(this.props.left, this.props) :
+      React.createElement(this.props.left, { ...this.props, ...this.props.leftProps }) :
       (
         <Text>
           {'<'}
@@ -44,9 +44,7 @@ const Title = (props) => {
 const Right = (props) => {
   return (
     <View style={props.rightStyle}>
-      <Text>
-        Placeholder
-      </Text>
+      {React.createElement(this.props.right, { ...props, ...props.rightProps })}
     </View>
   )
 }

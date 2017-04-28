@@ -81,6 +81,9 @@ export default class NavCard extends React.Component {
         height={this.props.height}
         element={this.props.element}
         left={left}
+        leftProps={this.config.navBarLeftProps}
+        rightProps={this.config.navBarRightProps}
+        centerProps={this.config.navBarCenterProps}
         center={center}
         right={right}
         navProps={this.navProps}
