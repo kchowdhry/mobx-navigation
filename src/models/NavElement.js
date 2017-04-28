@@ -23,7 +23,6 @@ export default class NavElement {
   constructor(navState, navProps, navConfig) {
     this.navState = navState;
     this.navProps = navProps;
-    console.log(navState.config);
     this.navConfig = { ...navState.config, ...navConfig };
     Log.trace('Nav element created with config: ', this.navConfig);
     this.key = elementCount;
@@ -41,10 +40,10 @@ export default class NavElement {
   get cardStyle(): Object {
     const style = {};
     if (this.navBarVisible && !this.navConfig.navBarTransparent) {
-      style.marginTop = this.navConfig.navBarStyle.height - STATUSBAR_HEIGHT;
+      style.paddingTop = this.navConfig.navBarStyle.height - STATUSBAR_HEIGHT;
     }
     if (this.tabBarVisible && !this.navConfig.tabBarTransparent) {
-      style.marginBottom = this.navConfig.tabBarStyle.height;
+      style.paddingBottom = this.navConfig.tabBarStyle.height;
     }
 
     return [style, this.navConfig.cardStyle];
