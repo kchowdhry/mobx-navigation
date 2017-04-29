@@ -31,7 +31,6 @@ export const defaultConfig = {
     left: 0,
     right: 0,
     top: 0,
-    paddingTop: STATUSBAR_HEIGHT,
     position: 'absolute',
     backgroundColor: 'white',
   },
@@ -94,7 +93,7 @@ export const defaultConfig = {
 
   },
   navBarTransparent: false,
-  statusBarStyle: 'default', // One of 'default' or stylesheet object
+  statusBarStyle: 'default', // One of default, light-content, or dark-content
   tabBarStyle: {
     height: 50,
   },

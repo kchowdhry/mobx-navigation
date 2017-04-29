@@ -40,7 +40,7 @@ export class NavState {
   // }
   config: Object;
 
-  currentStatusBarStyle = 'default';
+  currentStatusBarStyle: string = 'default';
 
   @observable front: NavNode = null;
   @observable back: NavNode = null;
