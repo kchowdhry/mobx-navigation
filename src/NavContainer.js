@@ -113,6 +113,10 @@ export default class NavContainer extends React.Component {
     const config = { ...defaultConfig, ...props };
 
     this.navState = new NavState(config);
+    if (typeof props.navStateRef === 'function') {
+      props.navStateRef(this.navState);
+    }
+
     Log.debug('Initializing nav container with configuration: ', config);
     const { height, width } = Dimensions.get('window');
     this.width = width;
