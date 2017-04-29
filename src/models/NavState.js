@@ -75,7 +75,12 @@ export class NavState {
 
   // Performs a 2-level object merge of a scene's configuration with the root one
   mergeNodeConfig(nodeConfig) {
-    const out = {}
+    if (!nodeConfig) {
+      return this.config;
+    }
+
+    const out = {};
+
     Object.keys(this.config).forEach((key) => {
       if (key === 'children') {
         return;
