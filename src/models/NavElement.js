@@ -23,7 +23,7 @@ export default class NavElement {
   constructor(navState, navProps, navConfig) {
     this.navState = navState;
     this.navProps = navProps;
-    this.navConfig = { ...navState.config, ...navConfig };
+    this.navConfig = navState.mergeNodeConfig(navConfig);
     Log.trace('Nav element created with config: ', this.navConfig);
     this.key = elementCount;
     elementCount += 1;

@@ -15,11 +15,9 @@ class OtherScene extends React.Component {
     navBarVisible: true,
     tabBarVisible: false,
     navBarStyle: {
-      ...defaultConfig.navBarStyle,
       backgroundColor: 'orange',
     },
     cardStyle: {
-      ...defaultConfig.cardStyle,
       backgroundColor: 'orange',
     }
   };

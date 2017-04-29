@@ -73,6 +73,29 @@ export class NavState {
     this.startTransition(this.rootNode);
   }
 
+  // Performs a 2-level object merge of a scene's configuration with the root one
+  mergeNodeConfig(nodeConfig) {
+    const out = {}
+    Object.keys(this.config).forEach((key) => {
+      if (key === 'children') {
+        return;
+      }
+
+      if (typeof this.config[key] === 'object') {
+        if (nodeConfig[key] && this.config[key]) {
+          out[key] = { ...this.config[key], ...nodeConfig[key] };
+        } else if (nodeConfig[key]) {
+          out[key] = nodeConfig[key];
+        } else if (this.config[key]) {
+          out[key] = this.config[key];
+        }
+      } else {
+        out[key] = nodeConfig[key] ? nodeConfig[key] : this.config[key];
+      }
+    })
+    return out;
+  }
+
   // Returns a promise that resolves when the transition to the new node has completed. In the promise
   // resolution, it is expected that the caller clean up any nodes that are now orphaned
   @action startTransition(node: NavNode): Promise<> {
