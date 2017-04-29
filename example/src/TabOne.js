@@ -4,9 +4,11 @@ import {
   Text,
   View
 } from 'react-native';
+import { inject, observer } from 'mobx-react';
 
 import { Tab2Scene1 } from './TabTwo';
 
+@inject('testStore') @observer
 export class Tab1 extends React.Component {
   static navConfig = {
     tabAffinity: '1',
@@ -19,7 +21,7 @@ export class Tab1 extends React.Component {
   };
 
   onPress2 = () => {
-    this.props.navState.push(Tab2Scene1);
+    this.props.navState.push(Tab2Scene1, { custom: ' there' });
   };
 
   render() {
@@ -27,6 +29,9 @@ export class Tab1 extends React.Component {
       <View style={{ flex: 1, backgroundColor: 'white' }}>
         <Button title={'scene 1'} onPress={this.onPress} />
         <Button title={'Tab 2 scene 1'} onPress={this.onPress2} />
+        <Text>
+          {this.props.testStore.data}
+        </Text>
       </View>
     );
   }

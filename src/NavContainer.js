@@ -92,7 +92,7 @@ export const defaultConfig = {
   tabBarStyle: {
     height: 50,
   },
-  logLevel: Log.Level.INFO,
+  logLevel: Log.Level.WARNING,
 }
 
 // Top level container for all navigation elements and scenes

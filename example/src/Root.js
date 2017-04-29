@@ -4,6 +4,7 @@ import {
   Text,
   View
 } from 'react-native';
+import { Provider } from 'mobx-react';
 
 import { NavContainer, NavTab } from '../..';
 
@@ -74,19 +75,25 @@ const TabCommon = (props) => {
   );
 }
 
+const testStore = {
+  data: 'hello',
+};
+
 export default class Root extends React.Component {
   render() {
     return (
-      <NavContainer
-        initialScene={TestScene}
-        initialProps={{ text: 'hello world' }}
-        logLevel={0}
-      >
-        <NavTab initialScene={Tab1} name={'1'} isInitial />
-        <NavTab initialScene={Tab2} name={'2'} />
-        <NavTab initialScene={Tab3} name={'3'} initialProps={{ color: 'red' }} />
-        <NavTab initialScene={DeepLink} name={'4'} />
-      </NavContainer>
+      <Provider testStore={testStore}>
+        <NavContainer
+          initialScene={TestScene}
+          initialProps={{ text: 'hello world' }}
+          logLevel={0}
+        >
+          <NavTab initialScene={Tab1} name={'1'} isInitial />
+          <NavTab initialScene={Tab2} name={'2'} />
+          <NavTab initialScene={Tab3} name={'3'} initialProps={{ color: 'red' }} />
+          <NavTab initialScene={DeepLink} name={'4'} />
+        </NavContainer>
+      </Provider>
     )
   }
 }

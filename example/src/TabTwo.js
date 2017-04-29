@@ -4,6 +4,7 @@ import {
   Text,
   View
 } from 'react-native';
+import { inject, observer } from 'mobx-react';
 
 import CachedScene from './CachedScene';
 
@@ -34,14 +35,18 @@ Tab2.navConfig = {
   tabBarVisible: true,
 };
 
-export const Tab2Scene1 = (props) => {
-  return (
-    <View style={{flex: 1, backgroundColor: 'white' }}>
-      <Text>
-        Tab 2 scene 1
-      </Text>
-    </View>
-  )
+@inject('testStore') @observer
+export class Tab2Scene1 extends React.Component {
+  render() {
+    return (
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
+        <Text>
+          {this.props.testStore.data}
+          {this.props.custom}
+        </Text>
+      </View>
+    );
+  }
 }
 
 Tab2Scene1.navConfig = {
