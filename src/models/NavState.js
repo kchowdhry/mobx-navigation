@@ -271,7 +271,7 @@ export class NavState {
 
       if (root.tabConfig.disableQuickReset || this.front === root) {
         // Exit early if this is already the active tab and quick reset is disabled
-        return Promise.reject();
+        return Promise.resolve();
       }
 
       this.startTransition(root).then(() => {
