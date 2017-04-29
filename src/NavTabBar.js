@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 
 import PropTypes from 'prop-types';
 
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
   },
 });
 
-@inject('navState') @observer
+@observer
 export default class NavTabBar extends React.Component {
   static propTypes = {
     children: function(props, propName, componentName) {
@@ -82,6 +82,10 @@ export default class NavTabBar extends React.Component {
     };
   }
 
+  get tabs() {
+    return React.Children.map(this.props.children, child => React.cloneElement(child, { ...this.props }));
+  }
+
   render() {
     if (React.Children.count(this.props.children) === 0) {
       return null;
@@ -94,7 +98,7 @@ export default class NavTabBar extends React.Component {
     return (
       <Animated.View style={[styles.container, style, this.props.style, this.xform]}>
         <View style={styles.buttons}>
-          {this.props.children}
+          {this.tabs}
         </View>
       </Animated.View>
     )

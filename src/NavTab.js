@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 
 import PropTypes from 'prop-types';
 
@@ -41,7 +41,7 @@ const TabButton  = (props) => {
   )
 }
 
-@inject('navState') @observer
+@observer
 export default class NavTab extends React.Component {
   static propTypes = {
     isInitial: PropTypes.bool,

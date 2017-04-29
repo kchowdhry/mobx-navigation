@@ -5,7 +5,7 @@ import {
   StyleSheet,
   View
 } from 'react-native';
-import { observer, Provider } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { autorun, observable } from 'mobx';
 import PropTypes from 'prop-types';
 
@@ -133,19 +133,23 @@ export default class NavContainer extends React.Component {
 
   cards() {
     return this.navState.elementPool.orderedElements().map(
-      element => <NavCard key={element.key} element={element} height={this.height} width={this.width} />);
+      element => <NavCard
+        navState={this.navState}
+        key={element.key}
+        element={element}
+        height={this.height}
+        width={this.width}
+      />);
   }
 
   render() {
     return (
-      <Provider navState={this.navState}>
-        <View style={{ flex: 1 }}>
-          {this.cards()}
-          <NavTabBar style={this.props.tabStyle} height={this.height} width={this.width}>
-            {this.props.children}
-          </NavTabBar>
-        </View>
-      </Provider>
-    )
+      <View style={{ flex: 1 }}>
+        {this.cards()}
+        <NavTabBar navState={this.navState} style={this.props.tabStyle} height={this.height} width={this.width}>
+          {this.props.children}
+        </NavTabBar>
+      </View>
+      );
   }
 }

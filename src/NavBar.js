@@ -9,9 +9,9 @@ import {
 
 import PropTypes from 'prop-types';
 
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 
-@inject('navState') @observer
+@observer
 class BackButton extends React.Component {
   render() {
     const inner = this.props.left ?
@@ -49,7 +49,7 @@ const Right = (props) => {
   )
 }
 
-@inject('navState') @observer
+@observer
 export default class NavBar extends React.Component {
   static propTypes = {
     navProps: PropTypes.object,

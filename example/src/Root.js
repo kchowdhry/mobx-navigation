@@ -7,9 +7,11 @@ import {
 
 import { NavContainer, NavTab } from '../..';
 
-import CachedScene from './CachedScene';
-import ComplexScene from './ComplexScene';
 import DeepLink from './DeepLink';
+
+import { Tab1 } from './TabOne';
+import { Tab2 } from './TabTwo';
+import { Tab3 } from './TabThree';
 
 const TestScene = (props) => {
   const onPress = () => {
@@ -62,132 +64,6 @@ const TestScene3 = (props) => {
       <Button title={'Test 3'} onPress={onPress} />
     </View>
   )
-};
-
-// ES6 style scene component example
-class Tab1 extends React.Component {
-  static navConfig = {
-    tabAffinity: '1',
-    tabBarVisible: true,
-    navBarVisible: true,
-  };
-
-  onPress = () => {
-    this.props.navState.push(Tab1Scene1);
-  };
-
-  onPress2 = () => {
-    this.props.navState.push(Tab2Scene1);
-  };
-
-  render() {
-    return (
-      <View style={{ flex: 1, backgroundColor: 'white' }}>
-        <Button title={'scene 1'} onPress={this.onPress} />
-        <Button title={'Tab 2 scene 1'} onPress={this.onPress2} />
-      </View>
-    );
-  }
-}
-
-const Tab1Scene1 = (props) => {
-  return (
-    <View style={{flex: 1, backgroundColor: 'white' }}>
-      <Text>
-        Tab 1 scene 1
-      </Text>
-    </View>
-  )
-}
-
-Tab1Scene1.navConfig = {
-  tabAffinity: '1',
-  tabBarVisible: true,
-  navBarVisible: true,
-};
-
-const Tab2 = (props) => {
-  const onPress = () => {
-    props.navState.push(Tab2Scene1);
-  };
-
-  const onPress2 = () => {
-    props.navState.push(CachedScene, { key: 'key1' });
-  };
-
-  const onPress3 = () => {
-    props.navState.push(CachedScene, { key: 'key2' });
-  };
-
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <Button title={'Tab 2'} onPress={onPress} />
-      <Button title={'Cached scene'} onPress={onPress2} />
-      <Button title={'Different scene'} onPress={onPress3} />
-    </View>
-  );
-}
-
-Tab2.navConfig = {
-  tabAffinity: '2',
-  tabBarVisible: true,
-};
-
-const Tab2Scene1 = (props) => {
-  return (
-    <View style={{flex: 1, backgroundColor: 'white' }}>
-      <Text>
-        Tab 2 scene 1
-      </Text>
-    </View>
-  )
-}
-
-Tab2Scene1.navConfig = {
-  navBarVisible: true,
-  tabAffinity: '2',
-};
-
-const Tab3 = (props) => {
-  const onPress = () => {
-    props.navState.push(Tab3Scene1);
-  };
-
-  const onPress2 = () => {
-    props.navState.push(ComplexScene, { title: 'start' });
-  }
-
-  const onPress3 = () => {
-    props.navState.push(CachedScene, { key: 'key1' });
-  }
-
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <Button title={'Tab 3'} onPress={onPress} />
-      <Button title={'Complex'} onPress={onPress2} />
-      <Button title={'Cached scene'} onPress={onPress3} />
-    </View>
-  );
-}
-
-Tab3.navConfig = {
-  tabAffinity: '3',
-  tabBarVisible: true,
-};
-
-const Tab3Scene1 = (props) => {
-  return (
-    <View style={{flex: 1, backgroundColor: 'white' }}>
-      <Text>
-        Tab 2 scene 1
-      </Text>
-    </View>
-  )
-}
-
-Tab3Scene1.navConfig = {
-  tabAffinity: '3',
-  tabBarVisible: true,
 };
 
 const TabCommon = (props) => {

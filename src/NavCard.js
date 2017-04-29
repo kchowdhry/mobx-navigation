@@ -5,7 +5,7 @@ import {
   View
 } from 'react-native';
 import PropTypes from 'prop-types';
-import { inject, observer } from 'mobx-react';
+import { observer } from 'mobx-react';
 
 import NavBar from './NavBar';
 
@@ -15,7 +15,7 @@ import NavBar from './NavBar';
 // in the back by the parent container.
 // If the component is inactive, it is rendered with its nav bar far outside the viewport.
 
-@inject('navState') @observer
+@observer
 export default class NavCard extends React.Component {
   static propTypes = {
     element: PropTypes.object,
@@ -78,6 +78,7 @@ export default class NavCard extends React.Component {
 
     return (
       <NavBar
+        navState={this.props.navState}
         height={this.props.height}
         element={this.props.element}
         left={left}
