@@ -44,7 +44,7 @@ const Title = (props) => {
 const Right = (props) => {
   return (
     <View style={props.rightStyle}>
-      {React.createElement(this.props.right, { ...props, ...props.rightProps })}
+      {React.createElement(props.right, { ...props, ...props.rightProps })}
     </View>
   )
 }
