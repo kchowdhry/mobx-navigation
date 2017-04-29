@@ -95,7 +95,7 @@ export class NavState {
           out[key] = this.config[key];
         }
       } else {
-        out[key] = nodeConfig[key] ? nodeConfig[key] : this.config[key];
+        out[key] = nodeConfig[key] !== undefined ? nodeConfig[key] : this.config[key];
       }
     })
     return out;

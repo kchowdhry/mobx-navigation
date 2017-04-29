@@ -81,6 +81,8 @@ export default class NavCard extends React.Component {
         navState={this.props.navState}
         height={this.props.height}
         element={this.props.element}
+        backImage={this.props.navBarBackImage}
+        backImageStyle={this.props.navBarBackImageStyle}
         left={left}
         leftProps={this.config.navBarLeftProps}
         rightProps={this.config.navBarRightProps}

@@ -46,6 +46,11 @@ export const defaultConfig = {
     borderBottomColor: '#828287',
     height: 68,
   },
+  navBarBackImage: null,
+  navBarBackImageStyle: {
+    width: 13,
+    height: 21,
+  },
   navBarCenter: null,
   navBarCenterProps: null,
   navBarCenterStyle: {
@@ -88,10 +93,12 @@ export const defaultConfig = {
   navBarSubtitleStyle: {
 
   },
+  navBarTransparent: false,
   statusBarStyle: 'default', // One of 'default' or stylesheet object
   tabBarStyle: {
     height: 50,
   },
+  tabBarTransparent: false,
   logLevel: Log.Level.WARNING,
 }
 

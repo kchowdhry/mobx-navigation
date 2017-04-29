@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Button,
+  Image,
   Platform,
   Text,
   TouchableOpacity,
@@ -13,18 +14,29 @@ import { observer } from 'mobx-react';
 
 @observer
 class BackButton extends React.Component {
-  render() {
-    const inner = this.props.left ?
-      React.createElement(this.props.left, { ...this.props, ...this.props.leftProps }) :
-      (
-        <Text>
-          {'<'}
-        </Text>
+  get contents() {
+    if (this.props.left) {
+      return React.createElement(this.props.left, { ...this.props, ...this.props.leftProps });
+    }
+
+    if (this.props.backImage) {
+      return (
+        <Image style={this.props.backImageStyle} source={this.props.backImage} />
       );
+    }
+
+    return (
+      <Text>
+        {'<'}
+      </Text>
+    );
+  }
+
+  render() {
     return (
       <View style={this.props.leftStyle}>
         <TouchableOpacity onPress={this.props.navState.pop}>
-          {inner}
+          {this.contents}
         </TouchableOpacity>
       </View>
     );
