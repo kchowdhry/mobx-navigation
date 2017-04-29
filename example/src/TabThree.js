@@ -5,7 +5,7 @@ import {
   View
 } from 'react-native';
 
-import CachedScene from './CachedScene';
+import { CachedScene, CachedScene2 } from './CachedScene';
 import ComplexScene from './ComplexScene';
 
 export const Tab3 = (props) => {
@@ -21,11 +21,16 @@ export const Tab3 = (props) => {
     props.navState.push(CachedScene, { key: 'key1' });
   }
 
+  const onPress4 = () => {
+    props.navState.push(CachedScene2, { key: 'key1' });
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       <Button title={'Tab 3'} onPress={onPress} />
       <Button title={'Complex'} onPress={onPress2} />
       <Button title={'Cached scene'} onPress={onPress3} />
+      <Button title={'Different scene with same key'} onPress={onPress4} />
     </View>
   );
 }

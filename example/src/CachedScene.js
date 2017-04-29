@@ -12,7 +12,7 @@ import { observer } from 'mobx-react';
 const createdCount = 0;
 
 @observer
-export default class CachedScene extends React.Component {
+export class CachedScene extends React.Component {
   static navConfig = {
     tabBarVisible: true,
     navBarVisible: true,
@@ -44,6 +44,37 @@ export default class CachedScene extends React.Component {
         <Button title='increment!' onPress={() => this.counter += 1} />
         <Text>
           {`There have been ${createdCount} created instance(s).`}
+        </Text>
+      </View>
+    )
+  }
+}
+
+@observer
+export class CachedScene2 extends React.Component {
+  static navConfig = {
+    tabBarVisible: true,
+    navBarVisible: true,
+    cacheHint: props => props.key,
+  }
+
+  @observable counter;
+
+  constructor(props) {
+    super(props);
+    createdCount += 1;
+    this.counter = 0;
+  }
+
+  render() {
+    return (
+      <View style={{flex: 1, backgroundColor: 'white'}}>
+        <Text>
+          {this.counter}
+        </Text>
+        <Button title='increment!' onPress={() => this.counter += 1} />
+        <Text>
+          {`There have been ${createdCount} created instance(s). (Note this is CachedScene2)`}
         </Text>
       </View>
     )

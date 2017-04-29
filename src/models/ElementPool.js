@@ -7,6 +7,10 @@ const INSTANCE_FREE_WATERMARK = 20;
 
 export default class ElementPool {
   navState: NavState;
+
+  // Map from component reference to sets of string keys (effectively namespaces keys by component type)
+  nodeKeys: Map<object, Map<string, object>> = new Map();
+
   // Mobx observable maps do not allow object keys so we make the instance pool a custom observable
   atom = new Atom('Nav instance pool');
   // Map from string or node to object with instance, refcount, and key
@@ -35,11 +39,27 @@ export default class ElementPool {
     return onscreen.concat(offscreen);
   }
 
+  hintToKey(hint: string, component: React.Component): object {
+    let keys = this.nodeKeys.get(component);
+    if (!keys) {
+      keys = new Map();
+      this.nodeKeys.set(component, keys);
+    }
+
+    let key = keys.get(hint);
+    if (!key) {
+      key = {};
+      keys.set(hint, key);
+    }
+
+    return key;
+  }
+
   // The hint is intended to be an object reference to a set of props used to define
   retain(node: NavNode): NavElement {
     // The instance returned by this function will either be created inline or was cached already by a previous
     // nav node sharing the same hint as this one
-    let id = node.hint || node;
+    let id = node.hint ? this.hintToKey(node.hint, node.component) : node;
 
     let value = this.elements.get(id);
     if (value) {
@@ -60,14 +80,15 @@ export default class ElementPool {
 
     if (node.hint) {
       // Noop if this node was not previously orphaned
-      this.orphanedElements.delete(node.hint);
+      this.orphanedElements.delete(id);
     }
 
     return value;
   }
 
   release(node: NavNode) {
-    let id = node.hint || node;
+    let id = node.hint ? this.hintToKey(node.hint, node.component) : node;
+
     const value = this.elements.get(id);
     if (value) {
       value.refCount -= 1;

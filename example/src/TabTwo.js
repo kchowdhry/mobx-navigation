@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { inject, observer } from 'mobx-react';
 
-import CachedScene from './CachedScene';
+import { CachedScene } from './CachedScene';
 
 export const Tab2 = (props) => {
   const onPress = () => {
