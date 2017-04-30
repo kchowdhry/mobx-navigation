@@ -99,6 +99,7 @@ export const defaultConfig = {
   },
   tabBarTransparent: false,
   logLevel: Log.Level.WARNING,
+  unique: false,
 }
 
 // Top level container for all navigation elements and scenes

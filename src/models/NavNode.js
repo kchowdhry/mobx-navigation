@@ -57,11 +57,15 @@ export default class NavNode {
       return this._hint;
     }
 
+    // Unlike other configuration values, the cache hint cannot be part of any template or default configuration
     if (this.component.navConfig) {
-      if (typeof this.component.navConfig.cacheHint === 'function') {
+      const cacheHintType = typeof this.component.navConfig.cacheHint;
+      if (cacheHintType === 'function') {
         this._hint = this.component.navConfig.cacheHint(this.props);
-      } else {
+      } else if (cacheHintType === 'string') {
         this._hint = this.component.navConfig.cacheHint;
+      } else {
+        Log.error(`Invalid cache hint type of ${cacheHintType} supplied to ${this.componentName}`);
       }
     }
 
@@ -69,7 +73,7 @@ export default class NavNode {
   }
 
   get isUnique() {
-    return this.component.navConfig && this.component.navConfig.unique;
+    return this.element.navConfig.unique;
   }
 
   // If this scene is used as the root of a tab, the configuration governing the tab are housed here
