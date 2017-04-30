@@ -36,7 +36,6 @@ export const defaultConfig = {
   },
   navBarStyle: {
     backgroundColor: 'white',
-    paddingTop: STATUSBAR_HEIGHT,
     position: 'absolute',
     left: 0,
     right: 0,

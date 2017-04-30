@@ -34,7 +34,11 @@ export default class ComplexScene extends React.Component {
     navBarCenter: NavBarCenter,
   }
 
-  @observable numClicks = 0;
+  @observable numClicks;
+
+  componentWillMount() {
+    this.numClicks = 0;
+  }
 
   onPress = () => {
     this.props.navProps.title = 'Pressed';

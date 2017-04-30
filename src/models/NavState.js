@@ -83,7 +83,7 @@ export class NavState {
       return base;
     }
 
-    let out = {};
+    let out = { ...base };
 
     if (nodeConfig.template) {
       // A single template was supplied, apply it to the final result
@@ -102,7 +102,7 @@ export class NavState {
       });
     }
 
-    Object.keys(base).forEach((key) => {
+    Object.keys(nodeConfig).forEach((key) => {
       if (key === 'children') {
         return;
       }
@@ -116,7 +116,7 @@ export class NavState {
           out[key] = base[key];
         }
       } else {
-        out[key] = nodeConfig[key] !== undefined ? nodeConfig[key] : base[key];
+        out[key] = nodeConfig[key];
       }
     })
     return out;

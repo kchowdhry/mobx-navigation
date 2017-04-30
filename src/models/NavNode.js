@@ -1,5 +1,6 @@
 import { computed, observable } from 'mobx';
 import React from 'react';
+import Log from '../Logger';
 
 export default class NavNode {
   // Back reference to root object
@@ -64,7 +65,7 @@ export default class NavNode {
         this._hint = this.component.navConfig.cacheHint(this.props);
       } else if (cacheHintType === 'string') {
         this._hint = this.component.navConfig.cacheHint;
-      } else {
+      } else if (cacheHintType !== 'undefined') {
         Log.error(`Invalid cache hint type of ${cacheHintType} supplied to ${this.componentName}`);
       }
     }
