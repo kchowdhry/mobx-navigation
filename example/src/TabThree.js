@@ -26,7 +26,7 @@ export const Tab3 = (props) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
+    <View style={{ flex: 1 }}>
       <Button title={'Tab 3'} onPress={onPress} />
       <Button title={'Complex'} onPress={onPress2} />
       <Button title={'Cached scene'} onPress={onPress3} />
@@ -38,6 +38,7 @@ export const Tab3 = (props) => {
 Tab3.navConfig = {
   tabAffinity: '3',
   tabBarVisible: true,
+  template: 'test',
 };
 
 export const Tab3Scene1 = (props) => {

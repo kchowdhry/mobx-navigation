@@ -14,6 +14,7 @@ export class Tab1 extends React.Component {
     tabAffinity: '1',
     tabBarVisible: true,
     navBarVisible: true,
+    templates: ['test'],
   };
 
   onPress = () => {
@@ -26,10 +27,10 @@ export class Tab1 extends React.Component {
 
   render() {
     return (
-      <View style={{ flex: 1, backgroundColor: 'white' }}>
-        <Button title={'scene 1'} onPress={this.onPress} />
-        <Button title={'Tab 2 scene 1'} onPress={this.onPress2} />
-        <Text>
+      <View style={{ flex: 1 }}>
+        <Button title={'scene 1'} onPress={this.onPress} style={{ backgroundColor: 'white' }} />
+        <Button title={'Tab 2 scene 1'} onPress={this.onPress2} style={{ backgroundColor: 'white' }} />
+        <Text style={{ color: 'white' }} >
           {this.props.testStore.data}
         </Text>
       </View>
@@ -39,7 +40,7 @@ export class Tab1 extends React.Component {
 
 export const Tab1Scene1 = (props) => {
   return (
-    <View style={{flex: 1, backgroundColor: 'white' }}>
+    <View style={{ flex: 1 }}>
       <Text>
         Tab 1 scene 1
       </Text>
@@ -51,4 +52,5 @@ Tab1Scene1.navConfig = {
   tabAffinity: '1',
   tabBarVisible: true,
   navBarVisible: true,
+  templates: ['test', 'test2'],
 };

@@ -34,11 +34,10 @@ export class NavState {
 
   initialTab: NavNode;
 
-  // {
-  //   tabBarHeight: number,
-  //   navBarHeight: number,
-  // }
   config: Object;
+  // If available, cards that specify a template (or several) will first overlay configuration from this object
+  // before applying their own overrides
+  templates: Object = {};
 
   currentStatusBarStyle: string = 'default';
 
@@ -57,10 +56,14 @@ export class NavState {
   multistepInProgress: boolean = false;
 
   // See propTypes and default config in NavContainer
-  constructor(config) {
+  constructor(config, templates) {
     if (!config.initialScene) {
       Log.error('Attempted to construct a NavState without an initial scene');
       return;
+    }
+
+    if (typeof templates === 'object') {
+      this.templates = templates;
     }
 
     Log.setLogLevel(config.logLevel);
@@ -73,29 +76,47 @@ export class NavState {
     this.startTransition(this.rootNode);
   }
 
-  // Performs a 2-level object merge of a scene's configuration with the root one
-  mergeNodeConfig(nodeConfig) {
+  // Performs a 2-level object merge of a scene's configuration with the root one, applying templates as they
+  // are available
+  mergeNodeConfig(nodeConfig, base = this.config) {
     if (!nodeConfig) {
-      return this.config;
+      return base;
     }
 
-    const out = {};
+    let out = {};
 
-    Object.keys(this.config).forEach((key) => {
+    if (nodeConfig.template) {
+      // A single template was supplied, apply it to the final result
+      const template = this.templates[nodeConfig.template];
+      if (template) {
+        base = this.mergeNodeConfig(template, base);
+      }
+    }
+
+    if (nodeConfig.templates) {
+      nodeConfig.templates.forEach((templateName) => {
+        const template = this.templates[templateName];
+        if (template) {
+          base = this.mergeNodeConfig(template, base);
+        }
+      });
+    }
+
+    Object.keys(base).forEach((key) => {
       if (key === 'children') {
         return;
       }
 
-      if (typeof this.config[key] === 'object') {
-        if (nodeConfig[key] && this.config[key]) {
-          out[key] = { ...this.config[key], ...nodeConfig[key] };
+      if (typeof base[key] === 'object') {
+        if (nodeConfig[key] && base[key]) {
+          out[key] = { ...base[key], ...nodeConfig[key] };
         } else if (nodeConfig[key]) {
           out[key] = nodeConfig[key];
-        } else if (this.config[key]) {
-          out[key] = this.config[key];
+        } else if (base[key]) {
+          out[key] = base[key];
         }
       } else {
-        out[key] = nodeConfig[key] !== undefined ? nodeConfig[key] : this.config[key];
+        out[key] = nodeConfig[key] !== undefined ? nodeConfig[key] : base[key];
       }
     })
     return out;

@@ -79,11 +79,27 @@ const testStore = {
   data: 'hello',
 };
 
+const testTemplate = {
+  cardStyle: {
+    backgroundColor: 'grey',
+  },
+};
+
+const secondTemplate = {
+  navBarStyle: {
+    backgroundColor: 'grey',
+  },
+};
+
 export default class Root extends React.Component {
   render() {
     return (
       <Provider testStore={testStore}>
         <NavContainer
+          templates={{
+            test: testTemplate,
+            test2: secondTemplate,
+          }}
           initialScene={TestScene}
           initialProps={{ text: 'hello world' }}
           logLevel={0}

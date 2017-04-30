@@ -17,14 +17,23 @@ export default class NavElement {
   navConfig: object;
 
   // The instance and ref are set shortly after the NavElement is constructed
-  instance: object;
+  _instance: object;
   @observable ref: object = null;
+
+  get instance() {
+    return this._instance;
+  }
+
+  set instance(i) {
+    this._instance = i;
+    console.log(i);
+    Log.trace(`Nav element ${i.type.displayName || i.type.name} created with config: `, this.navConfig);
+  }
 
   constructor(navState, navProps, navConfig) {
     this.navState = navState;
     this.navProps = navProps;
     this.navConfig = navState.mergeNodeConfig(navConfig);
-    Log.trace('Nav element created with config: ', this.navConfig);
     this.key = elementCount;
     elementCount += 1;
   }

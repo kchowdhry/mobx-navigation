@@ -117,8 +117,10 @@ export default class NavContainer extends React.Component {
   constructor(props) {
     super(props);
     const config = { ...defaultConfig, ...props };
+    // Unset templates as this is not an actual configuration value
+    config.templates = undefined;
 
-    this.navState = new NavState(config);
+    this.navState = new NavState(config, props.templates);
     if (typeof props.navStateRef === 'function') {
       props.navStateRef(this.navState);
     }
