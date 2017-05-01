@@ -8,8 +8,9 @@ import {
 
 import { observable } from 'mobx';
 
-import { defaultConfig } from '../..';
+import { scene } from '../..';
 
+@scene('OtherScene')
 class OtherScene extends React.Component {
   static navConfig = {
     navBarVisible: true,
@@ -23,11 +24,11 @@ class OtherScene extends React.Component {
   };
 
   onPress = () => {
-    this.props.navState.push(UniqueScene, { text: 'from other' });
+    this.props.navState.push('UniqueScene', { text: 'from other' });
   }
 
   onPress2 = () => {
-    this.props.navState.replace(UniqueScene, { text: 'replaced other' });
+    this.props.navState.replace('UniqueScene', { text: 'replaced other' });
   }
 
   render() {
@@ -43,6 +44,7 @@ class OtherScene extends React.Component {
   }
 }
 
+@scene('UniqueScene')
 export default class UniqueScene extends React.Component {
   static navConfig = {
     navBarVisible: true,
@@ -59,7 +61,7 @@ export default class UniqueScene extends React.Component {
   };
 
   onPress = () => {
-    this.props.navState.push(OtherScene);
+    this.props.navState.push('OtherScene');
   }
 
   render() {

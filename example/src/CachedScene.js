@@ -8,10 +8,11 @@ import {
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
+import { scene } from '../..'
 
 const createdCount = 0;
 
-@observer
+@scene('CachedScene') @observer
 export class CachedScene extends React.Component {
   static navConfig = {
     tabBarVisible: true,
@@ -50,7 +51,7 @@ export class CachedScene extends React.Component {
   }
 }
 
-@observer
+@scene('CachedScene2') @observer
 export class CachedScene2 extends React.Component {
   static navConfig = {
     tabBarVisible: true,

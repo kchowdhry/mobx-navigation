@@ -24,6 +24,20 @@ export const Motion = {
   SLIDE_OFF: 2,
 };
 
+// Object mapping from scene name to scene component definition
+const sceneRegistry = {};
+
+export function scene(key) {
+  return (target) => {
+    if (sceneRegistry[key]) {
+      Log.error(`Attempting to register a scene with duplicate name ${key}`);
+    }
+    sceneRegistry[key] = target;
+    target.navSceneKey = key;
+    return target;
+  }
+}
+
 export class NavState {
   elementPool: ElementPool = new ElementPool(this);
 
@@ -237,7 +251,20 @@ export class NavState {
     }
   }
 
-  @action push = (scene, props) => {
+  getScene(sceneKey) {
+    const scene = sceneRegistry[sceneKey];
+    if (!scene) {
+      Log.error(`Attempted to retrieve unregistered scene ${sceneKey}`);
+    }
+    return scene;
+  }
+
+  @action push = (sceneKey, props) => {
+    const scene = this.getScene(sceneKey);
+    if (!scene) {
+      return;
+    }
+
     const config = scene.navConfig || {};
     const node = new NavNode(this, scene, props);
 
@@ -282,7 +309,12 @@ export class NavState {
     });
   }
 
-  @action replace = (scene, props) => {
+  @action replace = (sceneKey, props) => {
+    const scene = this.getScene(sceneKey);
+    if (!scene) {
+      return;
+    }
+
     const currentActive = this.front;
     const newActive = new NavNode(this, scene, props);
     if (currentActive.previous) {

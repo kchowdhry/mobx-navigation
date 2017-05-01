@@ -5,10 +5,9 @@ import {
   View
 } from 'react-native';
 import { inject, observer } from 'mobx-react';
+import { scene } from '../..';
 
-import { Tab2Scene1 } from './TabTwo';
-
-@inject('testStore') @observer
+@scene('Tab1') @inject('testStore') @observer
 export class Tab1 extends React.Component {
   static navConfig = {
     tabAffinity: '1',
@@ -18,11 +17,11 @@ export class Tab1 extends React.Component {
   };
 
   onPress = () => {
-    this.props.navState.push(Tab1Scene1);
+    this.props.navState.push('Tab1Scene1');
   };
 
   onPress2 = () => {
-    this.props.navState.push(Tab2Scene1, { custom: ' there' });
+    this.props.navState.push('Tab2Scene1', { custom: ' there' });
   };
 
   render() {
@@ -38,7 +37,7 @@ export class Tab1 extends React.Component {
   }
 }
 
-export const Tab1Scene1 = (props) => {
+export const Tab1Scene1 = scene('Tab1Scene1')((props) => {
   return (
     <View style={{ flex: 1 }}>
       <Text>
@@ -46,7 +45,7 @@ export const Tab1Scene1 = (props) => {
       </Text>
     </View>
   )
-}
+});
 
 Tab1Scene1.navConfig = {
   tabAffinity: '1',

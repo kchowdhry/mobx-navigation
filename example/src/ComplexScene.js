@@ -8,6 +8,7 @@ import {
 
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
+import { scene } from '../..'
 
 const NavBarCenter = observer((props) => {
   return (
@@ -19,7 +20,7 @@ const NavBarCenter = observer((props) => {
   )
 });
 
-@observer
+@scene('ComplexScene') @observer
 export default class ComplexScene extends React.Component {
   static navConfig = {
     template: 'test',

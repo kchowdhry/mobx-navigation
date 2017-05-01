@@ -6,11 +6,11 @@ import {
 } from 'react-native';
 import { observer } from 'mobx-react'
 
-import { defaultConfig } from '../..';
+import { scene } from '../..';
 
 import UniqueScene from './Unique';
 
-const SceneOne = (props) => {
+const SceneOne = scene('SceneOne')((props) => {
   return (
     <View>
       <Text>
@@ -18,13 +18,13 @@ const SceneOne = (props) => {
       </Text>
     </View>
   )
-};
+});
 SceneOne.navConfig = {
   tabAffinity: '3',
   navBarVisible: true,
 };
 
-const SceneTwo = (props) => {
+const SceneTwo = scene('SceneTwo')((props) => {
   return (
     <View>
       <Text>
@@ -32,16 +32,15 @@ const SceneTwo = (props) => {
       </Text>
     </View>
   )
-};
+});
 SceneTwo.navConfig = {
   navBarVisible: true,
 };
 
-@observer
+@scene('DeepLink') @observer
 export default class DeepLink extends React.Component {
   static navConfig = {
     cardStyle: {
-      ...defaultConfig.cardStyle,
       backgroundColor: 'red',
     },
     navBarVisible: true,
@@ -51,13 +50,13 @@ export default class DeepLink extends React.Component {
   onPress = () => {
     const navState = this.props.navState;
     navState.multistep([
-      () => navState.push(SceneOne),
-      () => navState.push(SceneTwo),
+      () => navState.push('SceneOne'),
+      () => navState.push('SceneTwo'),
     ]);
   }
 
   onPress2 = () => {
-    this.props.navState.push(UniqueScene, { text: 'From tab 4' });
+    this.props.navState.push('UniqueScene', { text: 'From tab 4' });
   }
 
   render() {

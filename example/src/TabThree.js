@@ -5,9 +5,7 @@ import {
   View
 } from 'react-native';
 import { inject, observer } from 'mobx-react';
-
-import { CachedScene, CachedScene2 } from './CachedScene';
-import ComplexScene from './ComplexScene';
+import { scene } from '../..';
 
 @inject('navState') @observer
 export class TabDisplay extends React.Component {
@@ -22,21 +20,21 @@ export class TabDisplay extends React.Component {
   }
 }
 
-export const Tab3 = (props) => {
+export const Tab3 = scene('Tab3')((props) => {
   const onPress = () => {
-    props.navState.push(Tab3Scene1);
+    props.navState.push('Tab3Scene1');
   };
 
   const onPress2 = () => {
-    props.navState.push(ComplexScene, { title: 'start' });
+    props.navState.push('ComplexScene', { title: 'start' });
   }
 
   const onPress3 = () => {
-    props.navState.push(CachedScene, { key: 'key1' });
+    props.navState.push('CachedScene', { key: 'key1' });
   }
 
   const onPress4 = () => {
-    props.navState.push(CachedScene2, { key: 'key1' });
+    props.navState.push('CachedScene2', { key: 'key1' });
   }
 
   return (
@@ -48,7 +46,7 @@ export const Tab3 = (props) => {
       <TabDisplay />
     </View>
   );
-}
+});
 
 Tab3.navConfig = {
   tabAffinity: '3',
@@ -56,7 +54,7 @@ Tab3.navConfig = {
   template: 'test',
 };
 
-export const Tab3Scene1 = (props) => {
+export const Tab3Scene1 = scene('Tab3Scene1')((props) => {
   return (
     <View style={{flex: 1, backgroundColor: 'white' }}>
       <Text>
@@ -64,7 +62,7 @@ export const Tab3Scene1 = (props) => {
       </Text>
     </View>
   )
-}
+});
 
 Tab3Scene1.navConfig = {
   tabAffinity: '3',

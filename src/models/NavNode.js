@@ -50,7 +50,7 @@ export default class NavNode {
   @observable props;
 
   get componentName() {
-    return this.component.name;
+    return this.component.navSceneKey;
   }
 
   get hint() {

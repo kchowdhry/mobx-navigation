@@ -6,7 +6,8 @@ import {
 } from 'react-native';
 import { Provider } from 'mobx-react';
 
-import { NavContainer, NavTab } from '../..';
+import { scene, NavContainer, NavTab } from '../..';
+import './CachedScene';
 
 import DeepLink from './DeepLink';
 
@@ -14,7 +15,7 @@ import { Tab1 } from './TabOne';
 import { Tab2 } from './TabTwo';
 import { Tab3 } from './TabThree';
 
-const TestScene = (props) => {
+const TestScene = scene('TestScene')((props) => {
   const onPress = () => {
     props.navState.push(TestScene2);
   };
@@ -34,13 +35,13 @@ const TestScene = (props) => {
       <Button title={'Tabs!'} onPress={onPress3} />
     </View>
   )
-};
+});
 TestScene.navConfig = {
   // Root scenes are housed on the root stack prior to the existence of the tab bar
   isRootScene: true
 };
 
-const TestScene2 = (props) => {
+const TestScene2 = scene('TestScene2')((props) => {
   const onPress = () => {
     props.navState.pop();
   };
@@ -50,14 +51,14 @@ const TestScene2 = (props) => {
       <Button title={'Test 2'} onPress={onPress} />
     </View>
   )
-};
+});
 TestScene2.navConfig = {
   tabBarVisible: true,
 }
 
-const TestScene3 = (props) => {
+const TestScene3 = scene('TestScene3')((props) => {
   const onPress = () => {
-    props.navState.push(TestScene, { text: 'came from 3' });
+    props.navState.push('TestScene', { text: 'came from 3' });
   };
 
   return (
@@ -65,7 +66,7 @@ const TestScene3 = (props) => {
       <Button title={'Test 3'} onPress={onPress} />
     </View>
   )
-};
+});
 
 const TabCommon = (props) => {
   return (

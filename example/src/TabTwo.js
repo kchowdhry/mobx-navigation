@@ -6,19 +6,19 @@ import {
 } from 'react-native';
 import { inject, observer } from 'mobx-react';
 
-import { CachedScene } from './CachedScene';
+import { scene } from '../..';
 
-export const Tab2 = (props) => {
+export const Tab2 = scene('Tab2')((props) => {
   const onPress = () => {
-    props.navState.push(Tab2Scene1);
+    props.navState.push('Tab2Scene1');
   };
 
   const onPress2 = () => {
-    props.navState.push(CachedScene, { key: 'key1' });
+    props.navState.push('CachedScene', { key: 'key1' });
   };
 
   const onPress3 = () => {
-    props.navState.push(CachedScene, { key: 'key2' });
+    props.navState.push('CachedScene', { key: 'key2' });
   };
 
   return (
@@ -28,14 +28,14 @@ export const Tab2 = (props) => {
       <Button title={'Different scene'} onPress={onPress3} />
     </View>
   );
-}
+});
 
 Tab2.navConfig = {
   tabAffinity: '2',
   tabBarVisible: true,
 };
 
-@inject('testStore') @observer
+@scene('Tab2Scene1') @inject('testStore') @observer
 export class Tab2Scene1 extends React.Component {
   render() {
     return (
