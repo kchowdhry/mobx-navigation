@@ -83,43 +83,63 @@ export class NavState {
       return base;
     }
 
-    let out = { ...base };
-
-    if (nodeConfig.template) {
-      // A single template was supplied, apply it to the final result
-      const template = this.templates[nodeConfig.template];
-      if (template) {
-        base = this.mergeNodeConfig(template, base);
-      }
+    if (nodeConfig._merged) {
+      // This node config has already merged with the top level configuration and any templates it has specified
+      return nodeConfig;
     }
+
+    // Access all templates uniformly through the templates array
+    if (nodeConfig.template) {
+      if (nodeConfig.templates) {
+        nodeConfig.templates.unshift(nodeConfig.template);
+      } else {
+        nodeConfig.templates = [nodeConfig.template];
+      }
+      nodeConfig.template = undefined;
+    }
+
+    // If the node configuration has any templates defined, we destructively apply the template variables directly on
+    // the configuration itself and remove the template key so this template application only needs to happen once
+    // for each scene.
 
     if (nodeConfig.templates) {
       nodeConfig.templates.forEach((templateName) => {
         const template = this.templates[templateName];
         if (template) {
-          base = this.mergeNodeConfig(template, base);
+          Object.keys(template).forEach((key) => {
+            if (nodeConfig[key]) {
+              if (typeof nodeConfig[key] === 'object') {
+                nodeConfig[key] = { ...template[key], ...nodeConfig[key] };
+              }
+            } else {
+              nodeConfig[key] = template[key];
+            }
+          });
         }
       });
     }
+    nodeConfig.templates = undefined;
 
-    Object.keys(nodeConfig).forEach((key) => {
+    Object.keys(base).forEach((key) => {
       if (key === 'children') {
         return;
       }
 
-      if (typeof base[key] === 'object') {
-        if (nodeConfig[key] && base[key]) {
-          out[key] = { ...base[key], ...nodeConfig[key] };
-        } else if (nodeConfig[key]) {
-          out[key] = nodeConfig[key];
-        } else if (base[key]) {
-          out[key] = base[key];
+      // We still check the truthiness of base[key] because typeof null evaluates to 'object'
+      if (base[key] && typeof base[key] === 'object') {
+        if (nodeConfig[key]) {
+          nodeConfig[key] = { ...base[key], ...nodeConfig[key] };
+        } else {
+          nodeConfig[key] = base[key];
         }
-      } else {
-        out[key] = nodeConfig[key];
+      } else if (!nodeConfig[key]) {
+        nodeConfig[key] = base[key];
       }
-    })
-    return out;
+    });
+
+    // Set an internal flag to indicate that base config and templates have been applied
+    nodeConfig._merged = true;
+    return nodeConfig;
   }
 
   // Returns a promise that resolves when the transition to the new node has completed. In the promise
