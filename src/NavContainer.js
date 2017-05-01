@@ -5,7 +5,7 @@ import {
   StyleSheet,
   View
 } from 'react-native';
-import { observer } from 'mobx-react';
+import { observer, Provider } from 'mobx-react';
 import { autorun, observable } from 'mobx';
 import PropTypes from 'prop-types';
 
@@ -43,7 +43,7 @@ export const defaultConfig = {
     top: 0,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#828287',
-    height: 68,
+    height: 68 - STATUSBAR_HEIGHT,
   },
   navBarBackImage: null,
   navBarBackImageStyle: {
@@ -157,12 +157,14 @@ export default class NavContainer extends React.Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        {this.cards()}
-        <NavTabBar navState={this.navState} style={this.props.tabStyle} height={this.height} width={this.width}>
-          {this.props.children}
-        </NavTabBar>
-      </View>
-      );
+      <Provider navState={this.navState}>
+        <View style={{ flex: 1 }}>
+          {this.cards()}
+          <NavTabBar navState={this.navState} style={this.props.tabStyle} height={this.height} width={this.width}>
+            {this.props.children}
+          </NavTabBar>
+        </View>
+      </Provider>
+    );
   }
 }

@@ -22,6 +22,7 @@ const NavBarCenter = observer((props) => {
 @observer
 export default class ComplexScene extends React.Component {
   static navConfig = {
+    template: 'test',
     tabAffinity: '3',
     tabBarVisible: false,
     navBarVisible: true,

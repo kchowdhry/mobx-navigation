@@ -4,9 +4,23 @@ import {
   Text,
   View
 } from 'react-native';
+import { inject, observer } from 'mobx-react';
 
 import { CachedScene, CachedScene2 } from './CachedScene';
 import ComplexScene from './ComplexScene';
+
+@inject('navState') @observer
+export class TabDisplay extends React.Component {
+  render() {
+    return (
+      <View style={{ marginTop: 20 }}>
+        <Text style={{ color: 'red' }}>
+          {this.props.navState.activeTab}
+        </Text>
+      </View>
+    )
+  }
+}
 
 export const Tab3 = (props) => {
   const onPress = () => {
@@ -31,6 +45,7 @@ export const Tab3 = (props) => {
       <Button title={'Complex'} onPress={onPress2} />
       <Button title={'Cached scene'} onPress={onPress3} />
       <Button title={'Different scene with same key'} onPress={onPress4} />
+      <TabDisplay />
     </View>
   );
 }
