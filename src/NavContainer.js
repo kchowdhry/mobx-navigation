@@ -34,6 +34,7 @@ export const defaultConfig = {
     position: 'absolute',
     backgroundColor: 'white',
   },
+  initNavProps: null,
   navBarStyle: {
     backgroundColor: 'white',
     position: 'absolute',
