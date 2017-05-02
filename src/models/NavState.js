@@ -300,11 +300,27 @@ export class NavState {
     this.startTransition(node);
   }
 
-  @action pop = () => {
+  // By default, pops a single scene from the stack. If a number is supplied, it will pop that many scenes
+  @action pop = (sceneCount: number = 1) => {
+    if (sceneCount < 1) {
+      Log.error(`Attempted to pop an invalid number of scenes: ${sceenCount}`);
+      return Promise.reject();
+    }
+
     this.motion = Motion.SLIDE_OFF;
+
+    let current = this.front;
+    for (let i = 0; i < sceneCount; i += 1) {
+      if (!current) {
+        Log.error(`Attempted to pop ${sceneCount} scene(s) but there were fewer scenes on the stack`);
+        return Promise.reject();
+      }
+      current = current.previous;
+    }
+
     return new Promise((resolve) => {
-      this.startTransition(this.front.previous).then(() => {
-        this.front.next = null;
+      this.startTransition(current).then(() => {
+        current.next = null;
         resolve();
       });
     });

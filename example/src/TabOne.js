@@ -78,6 +78,7 @@ export const Tab1Scene3 = scene('Tab1Scene3')((props) => {
         Tab 1 scene 3
       </Text>
       <Button title="Pop to scene 1" onPress={() => props.navState.popTo('Tab1Scene1')} />
+      <Button title="Pop three times" onPress={() => props.navState.pop(3)} />
     </View>
   )
 });
