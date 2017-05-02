@@ -21,6 +21,10 @@ export class Tab1 extends React.Component {
   };
 
   onPress2 = () => {
+    this.props.navState.push('Tab1Scene1Alt');
+  };
+
+  onPress3 = () => {
     this.props.navState.push('Tab2Scene1', { custom: ' there' });
   };
 
@@ -28,6 +32,7 @@ export class Tab1 extends React.Component {
     return (
       <View style={{ flex: 1 }}>
         <Button title={'scene 1'} onPress={this.onPress} style={{ backgroundColor: 'white' }} />
+        <Button title={'scene 1 alt'} onPress={this.onPress2} style={{ backgroundColor: 'white' }} />
         <Button title={'Tab 2 scene 1'} onPress={this.onPress2} style={{ backgroundColor: 'white' }} />
         <Text style={{ color: 'white' }} >
           {this.props.testStore.data}
@@ -37,22 +42,36 @@ export class Tab1 extends React.Component {
   }
 }
 
-export const Tab1Scene1 = scene('Tab1Scene1')((props) => {
-  return (
-    <View style={{ flex: 1 }}>
-      <Text>
-        Tab 1 scene 1
-      </Text>
-      <Button title="Tab1Scene2" onPress={() => props.navState.push('Tab1Scene2')} />
-    </View>
-  )
-});
+@scene
+class Tab1Scene1 extends React.Component {
+  static multiNavConfig = {
+    Tab1Scene1: {
+      tabAffinity: '1',
+      tabBarVisible: true,
+      navBarVisible: true,
+    },
+    Tab1Scene1Alt: {
+      tabAffinity: '1',
+      tabBarVisible: true,
+      navBarVisible: true,
+      navBarStyle: {
+        backgroundColor: 'red',
+      }
+    }
+  }
 
-Tab1Scene1.navConfig = {
-  tabAffinity: '1',
-  tabBarVisible: true,
-  navBarVisible: true,
-};
+  render() {
+    return (
+      <View style={{ flex: 1 }}>
+        <Text>
+          Tab 1 scene 1
+      </Text>
+        <Button title="Tab1Scene2" onPress={() => this.props.navState.push('Tab1Scene2')} />
+      </View>
+    );
+  }
+}
+
 
 export const Tab1Scene2 = scene('Tab1Scene2')((props) => {
   return (

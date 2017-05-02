@@ -28,13 +28,37 @@ export const Motion = {
 const sceneRegistry = {};
 
 export function scene(key) {
-  return (target) => {
-    if (sceneRegistry[key]) {
-      Log.error(`Attempting to register a scene with duplicate name ${key}`);
-    }
-    sceneRegistry[key] = target;
-    target.navSceneKey = key;
+  if (typeof arguments[0] !== 'string') {
+    // For decorators without arguments, the first parameter is actually a misnomer and not a key but the target
+    // itself
+    const target = key;
+    // This target is expected to map to multiple keys, each of which is a key of the multiNavConfig
+    // static property of the instance
+    target.navSceneKeys = [];
+    Object.keys(target.multiNavConfig).forEach((sceneKey) => {
+      if (sceneRegistry[sceneKey]) {
+        Log.error(`Attempting to register a scene with duplicate name ${sceneKey}`);
+      }
+      sceneRegistry[sceneKey] = {
+        target,
+        config: target.multiNavConfig[sceneKey],
+      };
+      target.navSceneKeys.push(sceneKey);
+    });
     return target;
+  } else {
+    return (target) => {
+      if (sceneRegistry[key]) {
+        Log.error(`Attempting to register a scene with duplicate name ${key}`);
+      }
+
+      sceneRegistry[key] = {
+        target,
+        config: target.navConfig,
+      }
+      target.navSceneKey = key;
+      return target;
+    }
   }
 }
 
@@ -84,7 +108,10 @@ export class NavState {
 
     this.config = config;
 
-    this.rootNode = new NavNode(this, config.initialScene, config.initialProps);
+    this.rootNode = new NavNode(this, {
+      target: config.initialScene,
+      config: config.initialScene.navConfig,
+    }, config.initialProps);
 
     this.transitionValue = new Animated.Value(1);
     this.startTransition(this.rootNode);
@@ -262,7 +289,10 @@ export class NavState {
   }
 
   addTab(tabConfig: Object) {
-    const tab = new NavNode(this, tabConfig.initialScene, tabConfig.initialProps);
+    const tab = new NavNode(this, {
+      target: tabConfig.initialScene,
+      config: tabConfig.initialScene.navConfig,
+    }, tabConfig.initialProps);
     tab.tabConfig = tabConfig;
     this.tabNodes.set(tabConfig.name, tab);
     if (tabConfig.isInitial) {
@@ -284,7 +314,7 @@ export class NavState {
       return;
     }
 
-    const config = scene.navConfig || {};
+    const config = scene.config || {};
     const node = new NavNode(this, scene, props);
 
     let tail = null;

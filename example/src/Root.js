@@ -8,6 +8,7 @@ import { Provider } from 'mobx-react';
 
 import { scene, NavContainer, NavTab } from '../..';
 import './CachedScene';
+import './ComplexScene';
 
 import DeepLink from './DeepLink';
 

@@ -73,7 +73,7 @@ export default class ElementPool {
       this.atom.reportChanged();
       const navProps = (node.component.navConfig && node.component.navConfig.initNavProps) ?
         node.component.navConfig.initNavProps(node.props) : null;
-      value = new NavElement(this.navState, navProps, node.component.navConfig);
+      value = new NavElement(this.navState, navProps, node.config);
       value.instance = node.createInstance(navProps, value);
       this.elements.set(id, value);
     }

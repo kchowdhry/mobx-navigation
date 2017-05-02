@@ -47,6 +47,7 @@ export default class NavNode {
   }
 
   @observable component;
+  config;
   @observable props;
 
   get wrappedComponent() {
@@ -64,12 +65,12 @@ export default class NavNode {
     }
 
     // Unlike other configuration values, the cache hint cannot be part of any template or default configuration
-    if (this.component.navConfig) {
-      const cacheHintType = typeof this.component.navConfig.cacheHint;
+    if (this.config) {
+      const cacheHintType = typeof this.config.cacheHint;
       if (cacheHintType === 'function') {
-        this._hint = this.component.navConfig.cacheHint(this.props);
+        this._hint = this.config.cacheHint(this.props);
       } else if (cacheHintType === 'string') {
-        this._hint = this.component.navConfig.cacheHint;
+        this._hint = this.config.cacheHint;
       } else if (cacheHintType !== 'undefined') {
         Log.error(`Invalid cache hint type of ${cacheHintType} supplied to ${this.componentName}`);
       }
@@ -85,9 +86,10 @@ export default class NavNode {
   // If this scene is used as the root of a tab, the configuration governing the tab are housed here
   @observable tabConfig;
 
-  constructor(navState, component = null, props = {}) {
+  constructor(navState, scene, props = {}) {
     this.navState = navState;
-    this.component = component;
+    this.component = scene.target;
+    this.config = scene.config;
     this.props = props;
     this.element = navState.elementPool.retain(this);
   }
