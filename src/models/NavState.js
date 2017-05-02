@@ -262,7 +262,7 @@ export class NavState {
     return scene;
   }
 
-  @action push = (sceneKey, props, motion = Motion.SLIDE_ON) => {
+  @action push = (sceneKey: string, props, motion = Motion.SLIDE_ON) => {
     const scene = this.getScene(sceneKey);
     if (!scene) {
       return;
@@ -310,10 +310,37 @@ export class NavState {
     });
   }
 
-  @action replace = (sceneKey, props, motion = Motion.NONE) => {
+  @action popTo = (sceneKey: string) => {
+    const desired = sceneRegistry[sceneKey];
+    if (!desired) {
+      Log.error(`Attempted to pop to unregistered scene ${sceneKey}`);
+      return Promise.reject();
+    }
+
+    let previous = this.front.previous;
+    while (previous.component !== desired) {
+      if (!previous.component) {
+        Log.error(`Attempted to pop to scene ${sceneKey} which is not on the stack`);
+        return Promise.reject();
+      }
+
+      previous = previous.previous;
+    }
+
+    this.motion = Motion.SLIDE_OFF;
+    return new Promise((resolve) => {
+      this.startTransition(previous).then(() => {
+        previous.next = null;
+        resolve();
+      })
+    });
+  }
+
+  @action replace = (sceneKey: string, props, motion = Motion.NONE) => {
     const scene = this.getScene(sceneKey);
     if (!scene) {
-      return;
+      Log.error(`Attempted to replace existing scene with unregistered scene ${sceneKey}`);
+      return Promise.reject();
     }
 
     const currentActive = this.front;

@@ -43,6 +43,7 @@ export const Tab1Scene1 = scene('Tab1Scene1')((props) => {
       <Text>
         Tab 1 scene 1
       </Text>
+      <Button title="Tab1Scene2" onPress={() => props.navState.push('Tab1Scene2')} />
     </View>
   )
 });
@@ -51,5 +52,38 @@ Tab1Scene1.navConfig = {
   tabAffinity: '1',
   tabBarVisible: true,
   navBarVisible: true,
-  templates: ['test', 'test2'],
+};
+
+export const Tab1Scene2 = scene('Tab1Scene2')((props) => {
+  return (
+    <View style={{ flex: 1 }}>
+      <Text>
+        Tab 1 scene 2
+      </Text>
+      <Button title="Tab1Scene3" onPress={() => props.navState.push('Tab1Scene3')} />
+    </View>
+  )
+});
+
+Tab1Scene2.navConfig = {
+  tabAffinity: '1',
+  tabBarVisible: true,
+  navBarVisible: true,
+};
+
+export const Tab1Scene3 = scene('Tab1Scene3')((props) => {
+  return (
+    <View style={{ flex: 1 }}>
+      <Text>
+        Tab 1 scene 3
+      </Text>
+      <Button title="Pop to scene 1" onPress={() => props.navState.popTo('Tab1Scene1')} />
+    </View>
+  )
+});
+
+Tab1Scene3.navConfig = {
+  tabAffinity: '1',
+  tabBarVisible: true,
+  navBarVisible: true,
 };
