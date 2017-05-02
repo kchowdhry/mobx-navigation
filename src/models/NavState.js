@@ -75,7 +75,7 @@ export function scene(key) {
 
       sceneRegistry[key] = {
         target,
-        config: target.navConfig,
+        config: target.navConfig || {},
       }
       target.navSceneKey = key;
       return target;
@@ -138,16 +138,27 @@ export class NavState {
     this.startTransition(this.rootNode);
   }
 
+  get frontCustomConfig() {
+    return this.front.config.custom;
+  }
+
+  get backCustomConfig() {
+    return this.back ? this.back.config.custom : null;
+  }
+
   // Performs a 2-level object merge of a scene's configuration with the root one, applying templates as they
   // are available
   mergeNodeConfig(nodeConfig, base = this.config) {
     if (!nodeConfig) {
-      return base;
+      Object.keys(base).forEach((configKey) => {
+        nodeConfig[configKey] = base[configKey];
+      });
+      return;
     }
 
     if (nodeConfig._merged) {
       // This node config has already merged with the top level configuration and any templates it has specified
-      return nodeConfig;
+      return;
     }
 
     // Access all templates uniformly through the templates array
@@ -201,7 +212,6 @@ export class NavState {
 
     // Set an internal flag to indicate that base config and templates have been applied
     nodeConfig._merged = true;
-    return nodeConfig;
   }
 
   // Returns a promise that resolves when the transition to the new node has completed. In the promise

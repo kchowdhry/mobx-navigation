@@ -41,7 +41,8 @@ export default class NavElement {
   constructor(navState, navProps, navConfig) {
     this.navState = navState;
     this.navProps = navProps;
-    this.navConfig = navState.mergeNodeConfig(navConfig);
+    navState.mergeNodeConfig(navConfig);
+    this.navConfig = navConfig;
     this.key = elementCount;
     elementCount += 1;
   }

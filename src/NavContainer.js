@@ -24,6 +24,10 @@ const TransitionState = {
 const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : 0;
 
 export const defaultConfig = {
+  // You are free to put any data in here that you like and the library will merge the contents
+  // for you as appropriate. It may be accessed through the navState
+  custom: {},
+
   navBarVisible: false,
   tabBarVisible: false,
   cardStyle: {

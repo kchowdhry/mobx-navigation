@@ -33,7 +33,7 @@ export class Tab1 extends React.Component {
       <View style={{ flex: 1 }}>
         <Button title={'scene 1'} onPress={this.onPress} style={{ backgroundColor: 'white' }} />
         <Button title={'scene 1 alt'} onPress={this.onPress2} style={{ backgroundColor: 'white' }} />
-        <Button title={'Tab 2 scene 1'} onPress={this.onPress2} style={{ backgroundColor: 'white' }} />
+        <Button title={'Tab 2 scene 1'} onPress={this.onPress3} style={{ backgroundColor: 'white' }} />
         <Text style={{ color: 'white' }} >
           {this.props.testStore.data}
         </Text>
@@ -45,6 +45,9 @@ export class Tab1 extends React.Component {
 @scene
 class Tab1Scene1 extends React.Component {
   static navConfig = {
+    custom: {
+      myCustomConfig: 'custom config',
+    },
     navBarCenter: (props) => {
       return (
         <View>
@@ -76,8 +79,8 @@ class Tab1Scene1 extends React.Component {
     return (
       <View style={{ flex: 1 }}>
         <Text>
-          Tab 1 scene 1
-      </Text>
+          {this.props.navState.frontCustomConfig.myCustomConfig}
+        </Text>
         <Button title="Tab1Scene2" onPress={() => this.props.navState.push('Tab1Scene2')} />
       </View>
     );
