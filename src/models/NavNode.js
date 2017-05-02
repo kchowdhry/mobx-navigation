@@ -49,6 +49,11 @@ export default class NavNode {
   @observable component;
   @observable props;
 
+  get wrappedComponent() {
+    // Returns the wrapped component if it exists, and just the component if not
+    return this.component.wrappedComponent || this.component;
+  }
+
   get componentName() {
     return this.component.navSceneKey;
   }

@@ -24,6 +24,14 @@ export default class NavElement {
     return this._instance;
   }
 
+  get wrappedRef() {
+    if (!this.ref) {
+      return null;
+    }
+
+    return this.ref.wrappedInstance || this.ref;
+  }
+
   set instance(i) {
     this._instance = i;
     console.log(i);

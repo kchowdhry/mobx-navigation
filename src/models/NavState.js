@@ -169,13 +169,12 @@ export class NavState {
       return Promise.resolve();
     }
 
-    const component = node.component.wrappedComponent || node.component;
+    const component = node.wrappedComponent;
     if (component.prototype.componentWillShow) {
       // We perform the componentWillShow as a mobx reaction because it isn't immediately available
       when('node ref available', () => !!node.element.ref,
         () => {
-          const ref = node.element.ref.wrappedInstance || node.element.ref;
-          ref.componentWillShow();
+          node.element.wrappedRef.componentWillShow();
         });
     }
 
@@ -217,8 +216,8 @@ export class NavState {
 
   @action endTransition = (node) => {
     Log.trace(`Transitioned to node ${node.componentName}/${node.hint || ''}`);
-    if (node.element.ref && node.element.ref.componentDidShow) {
-      node.element.ref.componentDidShow();
+    if (node.element.wrappedRef && node.element.wrappedRef.componentDidShow) {
+      node.element.wrappedRef.componentDidShow();
     }
     if (node.element.navConfig.statusBarStyle !== this.currentStatusBarStyle) {
       StatusBar.setBarStyle(node.element.navConfig.statusBarStyle);
