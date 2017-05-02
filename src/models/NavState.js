@@ -262,7 +262,7 @@ export class NavState {
     return scene;
   }
 
-  @action push = (sceneKey, props) => {
+  @action push = (sceneKey, props, motion = Motion.SLIDE_ON) => {
     const scene = this.getScene(sceneKey);
     if (!scene) {
       return;
@@ -277,7 +277,6 @@ export class NavState {
     if (config.tabAffinity && config.tabAffinity !== this.activeTab) {
       // This scene has designated that it belongs on a particular tab. Swap to that stack and push this scene on
       tail = this.tabNodes.get(config.tabAffinity).tail;
-      this.motion = Motion.SLIDE_ON;
       targetTab = config.tabAffinity;
     } else if (config.isRootScene) {
       // This scene does not belong to any tab and should exist on the root stack
@@ -295,7 +294,7 @@ export class NavState {
       this.motion = Motion.NONE;
       this.activeTab = targetTab;
     } else {
-      this.motion = Motion.SLIDE_ON;
+      this.motion = motion;
     }
 
     this.startTransition(node);
@@ -311,7 +310,7 @@ export class NavState {
     });
   }
 
-  @action replace = (sceneKey, props) => {
+  @action replace = (sceneKey, props, motion = Motion.NONE) => {
     const scene = this.getScene(sceneKey);
     if (!scene) {
       return;
@@ -322,7 +321,7 @@ export class NavState {
     if (currentActive.previous) {
       currentActive.previous.next = newActive;
     }
-    this.motion = Motion.NONE;
+    this.motion = motion;
     return this.startTransition(newActive);
   }
 
