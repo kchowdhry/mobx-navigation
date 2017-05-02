@@ -164,9 +164,22 @@ export class NavState {
       return Promise.reject();
     }
 
+    if (node === this.front) {
+      Log.error(`Attempting to transition to the same node`);
+      return Promise.reject();
+    }
+
     if (this.multistepInProgress) {
       // We're in the middle of executing a multistep transactional transition
       return Promise.resolve();
+    }
+
+    const oldFront = this.front;
+    if (this.front) {
+      const oldFrontComponent = this.front.wrappedComponent;
+      if (oldFrontComponent.prototype.componentWillHide) {
+        oldFront.element.wrappedRef.componentWillHide();
+      }
     }
 
     const component = node.wrappedComponent;
@@ -191,7 +204,7 @@ export class NavState {
 
     // TODO custom callbacks
     if (this.motion === Motion.NONE) {
-      this.endTransition(node);
+      this.endTransition(node, oldFront);
       return Promise.resolve();
     }
 
@@ -208,16 +221,19 @@ export class NavState {
         duration: 200,
         useNativeDriver: true,
       }).start(() => {
-        this.endTransition(node);
+        this.endTransition(node, oldFront);
         resolve();
       });
     });
   }
 
-  @action endTransition = (node) => {
+  @action endTransition = (node, oldFront) => {
     Log.trace(`Transitioned to node ${node.componentName}/${node.hint || ''}`);
     if (node.element.wrappedRef && node.element.wrappedRef.componentDidShow) {
       node.element.wrappedRef.componentDidShow();
+    }
+    if (oldFront && oldFront.element.wrappedRef && oldFront.element.wrappedRef.componentDidHide) {
+      oldFront.element.wrappedRef.componentDidHide();
     }
     if (node.element.navConfig.statusBarStyle !== this.currentStatusBarStyle) {
       StatusBar.setBarStyle(node.element.navConfig.statusBarStyle);

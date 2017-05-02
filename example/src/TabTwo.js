@@ -45,6 +45,14 @@ export class Tab2Scene1 extends React.Component {
     this.props.navState.tabRoot();
   }
 
+  componentWillHide() {
+    console.log('Tab2Scene1 hiding');
+  }
+
+  componentDidHide() {
+    console.log('Tab2Scene1 hid');
+  }
+
   render() {
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>

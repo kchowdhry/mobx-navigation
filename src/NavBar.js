@@ -32,10 +32,14 @@ class BackButton extends React.Component {
     );
   }
 
+  onPress = () => {
+    this.props.navState.pop();
+  }
+
   render() {
     return (
       <View style={this.props.leftStyle}>
-        <TouchableOpacity onPress={this.props.navState.pop}>
+        <TouchableOpacity onPress={this.onPress}>
           {this.contents}
         </TouchableOpacity>
       </View>
