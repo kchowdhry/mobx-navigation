@@ -63,7 +63,7 @@ export default class ElementPool {
 
     let value = this.elements.get(id);
     if (value) {
-      Log.trace(`Found cached element for hint ${id}`);
+      Log.trace(`Found cached element for hint ${node.hint}`);
       value.refCount += 1;
     } else {
       if (node.hint) {

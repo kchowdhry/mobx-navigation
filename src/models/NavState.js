@@ -169,10 +169,14 @@ export class NavState {
       return Promise.resolve();
     }
 
-    if (node.component.prototype.componentWillShow) {
+    const component = node.component.wrappedComponent || node.component;
+    if (component.prototype.componentWillShow) {
       // We perform the componentWillShow as a mobx reaction because it isn't immediately available
       when('node ref available', () => !!node.element.ref,
-        () => node.element.ref.componentWillShow());
+        () => {
+          const ref = node.element.ref.wrappedInstance || node.element.ref;
+          ref.componentWillShow();
+        });
     }
 
     // Move nodes to the correct z-index as necessary

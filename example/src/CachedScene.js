@@ -7,12 +7,12 @@ import {
 } from 'react-native';
 
 import { observable } from 'mobx';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import { scene } from '../..'
 
 const createdCount = 0;
 
-@scene('CachedScene') @observer
+@scene('CachedScene') @inject('testStore') @observer
 export class CachedScene extends React.Component {
   static navConfig = {
     tabBarVisible: true,
