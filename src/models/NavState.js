@@ -34,14 +34,35 @@ export function scene(key) {
     const target = key;
     // This target is expected to map to multiple keys, each of which is a key of the multiNavConfig
     // static property of the instance
+
+    // If a navConfig is present (in addition to a multiNavConfig), apply the navConfig to all multi nav configs
+    const baseConfig = target.navConfig || {};
+
     target.navSceneKeys = [];
     Object.keys(target.multiNavConfig).forEach((sceneKey) => {
       if (sceneRegistry[sceneKey]) {
         Log.error(`Attempting to register a scene with duplicate name ${sceneKey}`);
       }
+
+      const merged = { ...baseConfig };
+      const config = target.multiNavConfig[sceneKey];
+      Object.keys(config).forEach((configKey) => {
+        if (merged[configKey]) {
+          if (Array.isArray(merged[configKey])) {
+            merged[configKey] = merged[configKey].concat(config[configKey]);
+          } else if (typeof merged[configKey] === 'object') {
+            merged[configKey] = { ...merged[configKey], ...config[configKey] };
+          } else {
+            merged[configKey] = config[configKey];
+          }
+        } else {
+          merged[configKey] = config[configKey];
+        }
+      })
+
       sceneRegistry[sceneKey] = {
         target,
-        config: target.multiNavConfig[sceneKey],
+        config: merged,
       };
       target.navSceneKeys.push(sceneKey);
     });

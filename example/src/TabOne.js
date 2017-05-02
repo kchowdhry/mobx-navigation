@@ -44,6 +44,18 @@ export class Tab1 extends React.Component {
 
 @scene
 class Tab1Scene1 extends React.Component {
+  static navConfig = {
+    navBarCenter: (props) => {
+      return (
+        <View>
+          <Text>
+            {'Common config'}
+          </Text>
+        </View>
+      );
+    }
+  };
+
   static multiNavConfig = {
     Tab1Scene1: {
       tabAffinity: '1',
