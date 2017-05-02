@@ -271,7 +271,6 @@ export class NavState {
     const config = scene.navConfig || {};
     const node = new NavNode(this, scene, props);
 
-    // TODO: handle scene uniqueness
     let tail = null;
     let targetTab = this.activeTab;
 
@@ -338,6 +337,28 @@ export class NavState {
     this.activeTab = this.initialTab.tabConfig.name;
     this.motion = Motion.NONE;
     return this.startTransition(this.initialTab);
+  }
+
+  // Reset the specified tab to the root node of the tab. If the argument is an empty string, resets to the
+  // root scene. If null or undefined, resets to the root node of the active tab
+  @action tabRoot = (tabName: string = null) => {
+    this.motion = Motion.NONE;
+    let node = null;
+    if (tabName === '') {
+      node = this.rootNode;
+      this.activeTab = tabName;
+    } else if (!tabName) {
+      node = this.tabNodes.get(this.activeTab);
+    } else {
+      node = this.tabNodes.get(tabName);
+      this.activeTab = tabName;
+    }
+
+    if (node) {
+      node.next = null;
+      return this.startTransition(node);
+    }
+    return Promise.reject();
   }
 
   @action tab = (name: string) => {

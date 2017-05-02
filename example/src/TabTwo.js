@@ -37,6 +37,14 @@ Tab2.navConfig = {
 
 @scene('Tab2Scene1') @inject('testStore') @observer
 export class Tab2Scene1 extends React.Component {
+  onPress = () => {
+    this.props.navState.tabRoot('3');
+  }
+
+  onPress2 = () => {
+    this.props.navState.tabRoot();
+  }
+
   render() {
     return (
       <View style={{ flex: 1, backgroundColor: 'white' }}>
@@ -44,6 +52,8 @@ export class Tab2Scene1 extends React.Component {
           {this.props.testStore.data}
           {this.props.custom}
         </Text>
+        <Button title={'Reset Tab 3'} onPress={this.onPress} />
+        <Button title={'Reset Tab 2'} onPress={this.onPress2} />
       </View>
     );
   }
