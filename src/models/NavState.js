@@ -502,6 +502,19 @@ export class NavState {
     }
   }
 
+  @action reset = () => {
+    this.elementPool.flush();
+    this.tabNodes = new Map();
+    this.rootNode = new NavNode(this, {
+      target: this.config.initialScene,
+      config: this.config.initialScene.navConfig,
+    }, this.config.initialProps);
+
+    this.transitionValue = new Animated.Value(1);
+    this.motion = Motion.NONE;
+    return this.startTransition(this.rootNode);
+  }
+
   // This function performs a multi-step transition where all the steps are functions
   // that execute the various transition types above
   @action multistep = (steps: Array = []) => {

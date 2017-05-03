@@ -39,6 +39,7 @@ class OtherScene extends React.Component {
       </Text>
         <Button title='Push unique scene' onPress={this.onPress} />
         <Button title='Replace with unique scene' onPress={this.onPress2} />
+        <Button title='reset all' onPress={this.props.navState.reset} />
       </View>
     );
   }
