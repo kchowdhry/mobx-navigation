@@ -118,6 +118,8 @@ export function scene(key) {
 }
 
 export class NavState {
+  transitionInProgress: boolean = false;
+
   elementPool: ElementPool = new ElementPool(this);
 
   rootNode: NavNode;
@@ -282,6 +284,8 @@ export class NavState {
       return Promise.resolve();
     }
 
+    this.transitionInProgress = true;
+
     const oldFront = this.front;
     if (this.front) {
       const oldFrontComponent = this.front.wrappedComponent;
@@ -352,6 +356,7 @@ export class NavState {
     this.transitionValue = new Animated.Value(1);
     this.back = null;
     this.motion = Motion.NONE;
+    this.transitionInProgress = false;
   }
 
   // Nav tab configuration:
@@ -390,6 +395,10 @@ export class NavState {
   }
 
   @action push = (sceneKey: string, props, motion = Motion.SLIDE_ON) => {
+    if (this.transitionInProgress) {
+      return Promise.resolve();
+    }
+
     const scene = this.getScene(sceneKey);
     if (!scene) {
       return;
@@ -429,6 +438,10 @@ export class NavState {
 
   // By default, pops a single scene from the stack. If a number is supplied, it will pop that many scenes
   @action pop = (sceneCount: number = 1) => {
+    if (this.transitionInProgress) {
+      return Promise.resolve();
+    }
+
     if (sceneCount < 1) {
       Log.error(`Attempted to pop an invalid number of scenes: ${sceenCount}`);
       return Promise.reject();
@@ -454,6 +467,10 @@ export class NavState {
   }
 
   @action popTo = (sceneKey: string) => {
+    if (this.transitionInProgress) {
+      return Promise.resolve();
+    }
+
     const desired = sceneRegistry[sceneKey];
     if (!desired) {
       Log.error(`Attempted to pop to unregistered scene ${sceneKey}`);
@@ -480,6 +497,10 @@ export class NavState {
   }
 
   @action replace = (sceneKey: string, props, motion = Motion.NONE) => {
+    if (this.transitionInProgress) {
+      return Promise.resolve();
+    }
+
     const scene = this.getScene(sceneKey);
     if (!scene) {
       Log.error(`Attempted to replace existing scene with unregistered scene ${sceneKey}`);
@@ -496,6 +517,10 @@ export class NavState {
   }
 
   @action tabs = () => {
+    if (this.transitionInProgress) {
+      return Promise.resolve();
+    }
+
     this.tabConfigs.forEach((config, name) => {
       if (!this.tabNodes.has(name)) {
         this.addTab(config);
@@ -511,6 +536,10 @@ export class NavState {
   // Reset the specified tab to the root node of the tab. If the argument is an empty string, resets to the
   // root scene. If null or undefined, resets to the root node of the active tab
   @action tabRoot = (tabName: string = null) => {
+    if (this.transitionInProgress) {
+      return Promise.resolve();
+    }
+
     this.motion = Motion.NONE;
     let node = null;
     if (tabName === '') {
@@ -531,6 +560,10 @@ export class NavState {
   }
 
   @action tab = (name: string) => {
+    if (this.transitionInProgress) {
+      return Promise.resolve();
+    }
+
     if (this.activeTab === name) {
       this.motion = Motion.NONE;
       const root = this.tabNodes.get(name);
