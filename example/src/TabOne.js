@@ -6,6 +6,7 @@ import {
 } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import { scene } from '../..';
+import Circular from './Circular';
 
 @scene('Tab1') @inject('testStore') @observer
 export class Tab1 extends React.Component {
@@ -28,12 +29,17 @@ export class Tab1 extends React.Component {
     this.props.navState.push('Tab2Scene1', { custom: ' there' });
   };
 
+  onPress4 = () => {
+    this.props.navState.push('Circular');
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
         <Button title={'scene 1'} onPress={this.onPress} style={{ backgroundColor: 'white' }} />
         <Button title={'scene 1 alt'} onPress={this.onPress2} style={{ backgroundColor: 'white' }} />
         <Button title={'Tab 2 scene 1'} onPress={this.onPress3} style={{ backgroundColor: 'white' }} />
+        <Button title={'Circular'} onPress={this.onPress4} />
         <Text style={{ color: 'white' }} >
           {this.props.testStore.data}
         </Text>
@@ -122,3 +128,13 @@ Tab1Scene3.navConfig = {
   tabBarVisible: true,
   navBarVisible: true,
 };
+
+export const CircularChild = (props) => {
+  return (
+    <View>
+      <Text>
+        {props.message}
+      </Text>
+    </View>
+  )
+}

@@ -27,6 +27,9 @@ export const Motion = {
 // Object mapping from scene name to scene component definition
 const sceneRegistry = {};
 
+const deferredScenes = {};
+const deferredMultiScenes = [];
+
 export function scene(key) {
   if (typeof arguments[0] !== 'string') {
     // For decorators without arguments, the first parameter is actually a misnomer and not a key but the target
@@ -36,16 +39,34 @@ export function scene(key) {
     // static property of the instance
 
     // If a navConfig is present (in addition to a multiNavConfig), apply the navConfig to all multi nav configs
-    const baseConfig = target.navConfig || {};
+    let baseConfig = {};
+    if (target.navConfig) {
+      if (typeof target.navConfig === 'function') {
+        deferredMultiScenes.push(target);
+        return;
+      } else {
+        baseConfig = target.navConfig;
+      }
+    }
+
+    let baseMultiConfig = {};
+    if (target.multiNavConfig) {
+      if (typeof target.multiNavConfig === 'function') {
+        deferredMultiScenes.push(target);
+        return;
+      } else {
+        baseMultiConfig = target.multiNavConfig;
+      }
+    }
 
     target.navSceneKeys = [];
-    Object.keys(target.multiNavConfig).forEach((sceneKey) => {
+    Object.keys(baseMultiConfig).forEach((sceneKey) => {
       if (sceneRegistry[sceneKey]) {
         Log.error(`Attempting to register a scene with duplicate name ${sceneKey}`);
       }
 
       const merged = { ...baseConfig };
-      const config = target.multiNavConfig[sceneKey];
+      const config = baseMultiConfig[sceneKey];
       Object.keys(config).forEach((configKey) => {
         if (merged[configKey]) {
           if (Array.isArray(merged[configKey])) {
@@ -73,9 +94,19 @@ export function scene(key) {
         Log.error(`Attempting to register a scene with duplicate name ${key}`);
       }
 
+      let baseConfig = {};
+      if (target.navConfig) {
+        if (typeof target.navConfig === 'function') {
+          deferredScenes[key] = target;
+          return;
+        } else {
+          baseConifg = target.navConfig;
+        }
+      }
+
       sceneRegistry[key] = {
         target,
-        config: target.navConfig || {},
+        config: baseConfig,
       }
       target.navSceneKey = key;
       return target;
@@ -124,6 +155,22 @@ export class NavState {
     if (typeof templates === 'object') {
       this.templates = templates;
     }
+
+    // Do a pass on all deferred scenes to ensure the nav config has loaded properly
+    Object.keys(deferredScenes).forEach((key) => {
+      const target = deferredScenes[key];
+      target.navConfig = target.navConfig();
+      scene(key);
+    });
+    deferredMultiScenes.forEach((target) => {
+      if (target.navConfig && typeof target.navConfig === 'function') {
+        target.navConfig = target.navConfig();
+      }
+      if (target.multiNavConfig && typeof target.multiNavConfig === 'function') {
+        target.multiNavConfig = target.multiNavConfig();
+      }
+      scene(target);
+    })
 
     Log.setLogLevel(config.logLevel);
 
