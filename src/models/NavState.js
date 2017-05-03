@@ -45,7 +45,7 @@ export function scene(key) {
         deferredMultiScenes.push(target);
         return;
       } else {
-        baseConfig = target.navConfig;
+        baseConfig = target.navConfig || {};
       }
     }
 
@@ -57,6 +57,9 @@ export function scene(key) {
       } else {
         baseMultiConfig = target.multiNavConfig;
       }
+    } else {
+      Log.error(`A scene key was not supplied to component ${target.constructor.name} but no multiNavConfig property was defined`);
+      return;
     }
 
     target.navSceneKeys = [];
@@ -100,7 +103,7 @@ export function scene(key) {
           deferredScenes[key] = target;
           return;
         } else {
-          baseConifg = target.navConfig;
+          baseConfig = target.navConfig || {};
         }
       }
 
