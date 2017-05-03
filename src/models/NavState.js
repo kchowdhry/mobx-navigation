@@ -290,7 +290,10 @@ export class NavState {
     if (this.front) {
       const oldFrontComponent = this.front.wrappedComponent;
       if (oldFrontComponent.prototype.componentWillHide) {
-        oldFront.element.wrappedRef.componentWillHide();
+        when('node ref available', () => !!oldFront.element.wrappedRef,
+          () => {
+            oldFront.element.wrappedRef.componentWillHide();
+          });
       }
     }
 
