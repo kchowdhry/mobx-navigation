@@ -118,7 +118,7 @@ export function scene(key) {
 }
 
 export class NavState {
-  transitionInProgress: boolean = false;
+  @observable transitionInProgress: boolean = false;
 
   elementPool: ElementPool = new ElementPool(this);
 
