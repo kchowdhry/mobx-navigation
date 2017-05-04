@@ -30,6 +30,40 @@ const sceneRegistry = {};
 const deferredScenes = {};
 const deferredMultiScenes = [];
 
+// Attempts to apply right to left, merging objects or arrays as appropriate
+function mergeValues(left, right) {
+  if (right === undefined) {
+    return left;
+  }
+
+  // This branch exists because tyepof null is technically 'object'
+  if (left === null && right) {
+    return right;
+  }
+
+  if (Array.isArray(left)) {
+    // This works regardless of whether right is an array or not
+    return left.concat(right);
+  }
+
+  // The ordering of this statement relative to the one above is important to preserve right over left semantic
+  if (Array.isArray(right)) {
+    return [left].concat(right);
+  }
+
+  if (typeof left === 'object') {
+    if (typeof right === 'object') {
+      return { ...left, ...right };
+    }
+
+    // For heterogeneous types, we assume that the right value is in fact a stylesheet reference and we
+    // convert a stylesheet object into an array
+    return [ left, right ];
+  }
+
+  return right;
+}
+
 export function scene(key) {
   if (typeof arguments[0] !== 'string') {
     // For decorators without arguments, the first parameter is actually a misnomer and not a key but the target
@@ -71,17 +105,7 @@ export function scene(key) {
       const merged = { ...baseConfig };
       const config = baseMultiConfig[sceneKey];
       Object.keys(config).forEach((configKey) => {
-        if (merged[configKey]) {
-          if (Array.isArray(merged[configKey])) {
-            merged[configKey] = merged[configKey].concat(config[configKey]);
-          } else if (typeof merged[configKey] === 'object') {
-            merged[configKey] = { ...merged[configKey], ...config[configKey] };
-          } else {
-            merged[configKey] = config[configKey];
-          }
-        } else {
-          merged[configKey] = config[configKey];
-        }
+        merged[configKey] = mergeValues(merged[configKey], config[configKey]);
       })
 
       sceneRegistry[sceneKey] = {
@@ -232,13 +256,7 @@ export class NavState {
         const template = this.templates[templateName];
         if (template) {
           Object.keys(template).forEach((key) => {
-            if (nodeConfig[key]) {
-              if (typeof nodeConfig[key] === 'object') {
-                nodeConfig[key] = { ...template[key], ...nodeConfig[key] };
-              }
-            } else {
-              nodeConfig[key] = template[key];
-            }
+            nodeConfig[key] = mergeValues(template[key], nodeConfig[key]);
           });
         }
       });
@@ -251,15 +269,7 @@ export class NavState {
       }
 
       // We still check the truthiness of base[key] because typeof null evaluates to 'object'
-      if (base[key] && typeof base[key] === 'object') {
-        if (nodeConfig[key]) {
-          nodeConfig[key] = { ...base[key], ...nodeConfig[key] };
-        } else {
-          nodeConfig[key] = base[key];
-        }
-      } else if (!nodeConfig[key]) {
-        nodeConfig[key] = base[key];
-      }
+      nodeConfig[key] = mergeValues(base[key], nodeConfig[key]);
     });
 
     // Set an internal flag to indicate that base config and templates have been applied
@@ -481,13 +491,13 @@ export class NavState {
     }
 
     let previous = this.front.previous;
-    while (previous.component !== desired) {
-      if (!previous.component) {
+    while (previous.component !== desired.target) {
+      previous = previous.previous;
+
+      if (!previous) {
         Log.error(`Attempted to pop to scene ${sceneKey} which is not on the stack`);
         return Promise.reject();
       }
-
-      previous = previous.previous;
     }
 
     this.motion = Motion.SLIDE_OFF;

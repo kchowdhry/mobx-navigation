@@ -2,11 +2,18 @@ import React from 'react';
 import {
   Button,
   Text,
+  StyleSheet,
   View
 } from 'react-native';
 import { inject, observer } from 'mobx-react';
 import { scene } from '../..';
 import Circular from './Circular';
+
+const styles = StyleSheet.create({
+  test: {
+    backgroundColor: 'green',
+  },
+});
 
 @scene('Tab1') @inject('testStore') @observer
 export class Tab1 extends React.Component {
@@ -14,6 +21,7 @@ export class Tab1 extends React.Component {
     tabAffinity: '1',
     tabBarVisible: true,
     navBarVisible: true,
+    cardStyle: styles.test,
     templates: ['test'],
   };
 
