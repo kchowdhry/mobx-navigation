@@ -36,6 +36,11 @@ function mergeValues(left, right) {
     return left;
   }
 
+  // A user specified value of null is interpreted as an erasure of the underlying default
+  if (right === null) {
+    return null;
+  }
+
   // This branch exists because tyepof null is technically 'object'
   if (left === null && right) {
     return right;
