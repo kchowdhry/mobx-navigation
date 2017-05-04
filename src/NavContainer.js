@@ -9,7 +9,7 @@ import { observer, Provider } from 'mobx-react';
 import { autorun, observable } from 'mobx';
 import PropTypes from 'prop-types';
 
-import { NavState } from './models/NavState';
+import { NavState, mergeValues } from './models/NavState';
 import NavTabBar from './NavTabBar';
 import NavCard from './NavCard';
 
@@ -121,7 +121,10 @@ export default class NavContainer extends React.Component {
 
   constructor(props) {
     super(props);
-    const config = { ...defaultConfig, ...props };
+    const config = { ...props };
+    Object.keys(defaultConfig).forEach((key) => {
+      config[key] = mergeValues(defaultConfig[key], config[key]);
+    });
     // Unset templates as this is not an actual configuration value
     config.templates = undefined;
 

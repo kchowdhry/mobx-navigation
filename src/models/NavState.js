@@ -31,7 +31,7 @@ const deferredScenes = {};
 const deferredMultiScenes = [];
 
 // Attempts to apply right to left, merging objects or arrays as appropriate
-function mergeValues(left, right) {
+export function mergeValues(left, right) {
   if (right === undefined) {
     return left;
   }
