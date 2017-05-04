@@ -165,7 +165,7 @@ export class NavState {
     Object.keys(deferredScenes).forEach((key) => {
       const target = deferredScenes[key];
       target.navConfig = target.navConfig();
-      scene(key);
+      scene(key)(target);
     });
     deferredMultiScenes.forEach((target) => {
       if (target.navConfig && typeof target.navConfig === 'function') {
