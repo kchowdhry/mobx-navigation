@@ -5,6 +5,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from 'react-native';
 
 import { observer } from 'mobx-react';
@@ -12,6 +13,32 @@ import { observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 
 const styles = StyleSheet.create({
+
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    flexDirection: 'column',
+    marginBottom: 6,
+  },
+  selectedTab: {
+    tintColor: 'rgb(105, 179, 231)',
+  },
+  tabText: {
+    fontSize: 10,
+    letterSpacing: 0.1,
+    color: 'rgb(134, 134, 134)',
+  },
+  selectedTabText: {
+    color: 'rgb(105, 179, 231)',
+  },
+  tabIcon: {
+    marginBottom: 4,
+    tintColor: 'rgb(134, 134, 134)',
+  },
+
+
+
   button: {
     flex: 1,
     flexDirection: 'column',
@@ -28,6 +55,31 @@ const styles = StyleSheet.create({
 });
 
 const TabButton  = (props) => {
+  let selectedStyle;
+  let selectedTextStyle;
+  if (props.active) {
+    selectedStyle = styles.selectedTab;
+    selectedTextStyle = styles.selectedTabText;
+  }
+
+  return (
+    <View style={styles.tabButton}>
+      <Image
+        source={props.source}
+        style={[styles.tabIcon, selectedStyle]}
+      />
+      <Text style={[styles.tabText, selectedTextStyle]}>
+        {props.name}
+      </Text>
+    </View>
+  )
+
+
+
+
+
+
+
   const style = {
     backgroundColor: props.active ? 'blue' : 'white',
   };
