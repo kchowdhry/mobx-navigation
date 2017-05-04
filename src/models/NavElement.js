@@ -1,3 +1,4 @@
+import React from 'react';
 import { Platform } from 'react-native';
 import { observable } from 'mobx';
 
@@ -34,17 +35,38 @@ export default class NavElement {
 
   set instance(i) {
     this._instance = i;
-    console.log(i);
     Log.trace(`Nav element ${i.type.displayName || i.type.name} created with config: `, this.navConfig);
   }
 
-  constructor(navState, navProps, navConfig) {
+  constructor(navState, node) {
     this.navState = navState;
-    this.navProps = navProps;
-    navState.mergeNodeConfig(navConfig);
-    this.navConfig = navConfig;
+    navState.mergeNodeConfig(node.config);
+    this.navConfig = node.config;
+    this.navProps = this.navConfig.initNavProps ? this.navConfig.initNavProps(node.props) : null;
+    this.instance = this.createInstance(node.component, node.props);
     this.key = elementCount;
     elementCount += 1;
+  }
+
+  createInstance(component, props) {
+    // Careful! We want to store a ref to the underlying element but we have to be careful not to
+    // prevent the caller from grabbing the ref as well
+    // The conditional expression here ensures we don't try to grab the ref of a stateless component
+    // as this is disallowed in React
+    const ref = component.prototype.render ?
+      (r) => {
+        if (typeof props.ref === 'function') {
+          props.ref(r);
+        }
+        this.ref = r;
+      } : undefined;
+
+    return React.createElement(component, {
+      navState: this.navState,
+      navProps: this.navProps,
+      ...props,
+      ref,
+    });
   }
 
   get tabBarVisible(): boolean {

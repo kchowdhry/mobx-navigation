@@ -67,14 +67,11 @@ export default class ElementPool {
       value.refCount += 1;
     } else {
       if (node.hint) {
-        Log.trace(`Creating new cached element for hint ${id}`);
+        Log.trace(`Creating new cached element for hint ${node.hint}`);
       }
 
       this.atom.reportChanged();
-      const navProps = (node.component.navConfig && node.component.navConfig.initNavProps) ?
-        node.component.navConfig.initNavProps(node.props) : null;
-      value = new NavElement(this.navState, navProps, node.config);
-      value.instance = node.createInstance(navProps, value);
+      value = new NavElement(this.navState, node);
       this.elements.set(id, value);
     }
 

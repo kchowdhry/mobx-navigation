@@ -1,5 +1,4 @@
 import { computed, observable } from 'mobx';
-import React from 'react';
 import Log from '../Logger';
 
 export default class NavNode {
@@ -100,26 +99,5 @@ export default class NavNode {
     }
 
     return this.next.tail;
-  }
-
-  createInstance(navProps, element) {
-    // Careful! We want to store a ref to the underlying element but we have to be careful not to
-    // prevent the caller from grabbing the ref as well
-    // The conditional expression here ensures we don't try to grab the ref of a stateless component
-    // as this is disallowed in React
-    const ref = this.component.prototype.render ?
-      (r) => {
-        if (typeof this.props.ref === 'function') {
-          this.props.ref(r);
-        }
-        element.ref = r;
-      } : undefined;
-
-    return React.createElement(this.component, {
-      navState: this.navState,
-      navProps,
-      ...this.props,
-      ref,
-    });
   }
 }

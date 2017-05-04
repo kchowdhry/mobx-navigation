@@ -18,11 +18,11 @@ import { Tab3 } from './TabThree';
 
 const TestScene = scene('TestScene')((props) => {
   const onPress = () => {
-    props.navState.push(TestScene2);
+    props.navState.push('TestScene2');
   };
 
   const onPress2 = () => {
-    props.navState.replace(TestScene3);
+    props.navState.replace('TestScene3');
   };
 
   const onPress3 = () => {
