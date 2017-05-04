@@ -93,11 +93,16 @@ export default class NavBar extends React.Component {
       bottom: this.props.height - this.props.navState.config.navBarStyle.height,
     };
 
-    const props = { ...this.props, navProps: this.props.navProps };
+    const props = {
+      centerStyle: this.props.centerStyle,
+      titleStyle: this.props.titleStyle,
+      ...this.props.centerProps,
+      navProps: this.props.navProps
+    };
 
-    const back = this.hasBack ? (<BackButton {...props} />) : null;
+    const back = this.hasBack ? (<BackButton {...this.props}  navProps={this.props.navProps} />) : null;
 
-    const right = this.props.right ? (<Right {...props} />) : null;
+    const right = this.props.right ? (<Right {...this.props} navProps={this.props.navProps} />) : null;
 
     return (
       <View style={[style, this.props.style]}>
