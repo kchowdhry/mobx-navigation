@@ -47,6 +47,7 @@ export default class NavTab extends React.Component {
     isInitial: PropTypes.bool,
     disableQuickReset: PropTypes.bool,
     button: PropTypes.element,
+    buttonProps: PropTypes.object,
     name: PropTypes.string.isRequired,
     initialScene: PropTypes.func.isRequired,
     initalProps: PropTypes.object,
@@ -61,6 +62,10 @@ export default class NavTab extends React.Component {
     this.props.navState.tab(this.props.name);
   }
 
+  get buttonProps() {
+    return this.props.buttonProps || {};
+  }
+
   render() {
     const content = this.props.button ? this.props.button : TabButton;
     const active = this.props.navState.activeTab === this.props.name;
@@ -68,7 +73,7 @@ export default class NavTab extends React.Component {
     return (
       <View style={styles.button}>
         <TouchableOpacity onPress={this.onPress} style={styles.button}>
-          {React.createElement(content, { ...this.props, active })}
+          {React.createElement(content, { ...this.props, ...this.buttonProps, active })}
         </TouchableOpacity>
       </View>
     )
