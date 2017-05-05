@@ -223,8 +223,16 @@ export class NavState {
     return this.front.config.custom;
   }
 
+  get frontSceneKey() {
+    return this.front.component.navSceneKey;
+  }
+
   get backCustomConfig() {
     return this.back ? this.back.config.custom : null;
+  }
+
+  get backSceneKey() {
+    return this.back ? this.back.component.navSceneKey : null;
   }
 
   // Performs a 2-level object merge of a scene's configuration with the root one, applying templates as they
