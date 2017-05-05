@@ -46,7 +46,7 @@ export default class NavTab extends React.Component {
   static propTypes = {
     isInitial: PropTypes.bool,
     disableQuickReset: PropTypes.bool,
-    button: PropTypes.element,
+    button: PropTypes.any,
     buttonProps: PropTypes.object,
     name: PropTypes.string.isRequired,
     initialScene: PropTypes.func.isRequired,
