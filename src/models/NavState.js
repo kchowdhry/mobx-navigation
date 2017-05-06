@@ -623,6 +623,10 @@ export class NavState {
 
     this.transitionValue = new Animated.Value(1);
     this.motion = Motion.NONE;
+    this.tabConfigs.forEach((config, name) => {
+      this.addTab(config);
+    });
+
     return this.startTransition(this.rootNode);
   }
 
