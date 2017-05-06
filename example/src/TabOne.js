@@ -41,6 +41,10 @@ export class Tab1 extends React.Component {
     this.props.navState.push('Circular');
   }
 
+  onPress5 = () => {
+    this.props.navState.reset();
+  }
+
   render() {
     return (
       <View style={{ flex: 1 }}>
@@ -48,6 +52,7 @@ export class Tab1 extends React.Component {
         <Button title={'scene 1 alt'} onPress={this.onPress2} style={{ backgroundColor: 'white' }} />
         <Button title={'Tab 2 scene 1'} onPress={this.onPress3} style={{ backgroundColor: 'white' }} />
         <Button title={'Circular'} onPress={this.onPress4} />
+        <Button title={'reset'} onPress={this.onPress5} />
         <Text style={{ color: 'white' }} >
           {this.props.testStore.data}
         </Text>

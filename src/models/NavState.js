@@ -618,6 +618,8 @@ export class NavState {
       target: this.config.initialScene,
       config: this.config.initialScene.navConfig,
     }, this.config.initialProps);
+    this.front = null;
+    this.back = null;
 
     this.transitionValue = new Animated.Value(1);
     this.motion = Motion.NONE;
