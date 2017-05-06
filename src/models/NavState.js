@@ -459,7 +459,7 @@ export class NavState {
       this.motion = motion;
     }
 
-    this.startTransition(node);
+    return this.startTransition(node);
   }
 
   // By default, pops a single scene from the stack. If a number is supplied, it will pop that many scenes
