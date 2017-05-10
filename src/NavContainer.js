@@ -155,6 +155,7 @@ export default class NavContainer extends React.Component {
     BackAndroid.addEventListener('hardwareBackPress', () => {
       if (this.navState.front.previous) {
         this.navState.pop();
+        return true;
       }
     });
   }
