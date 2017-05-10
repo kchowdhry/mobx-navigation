@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  BackAndroid,
   Dimensions,
   Platform,
   StyleSheet,
@@ -106,6 +107,8 @@ export const defaultConfig = {
   unique: false,
 }
 
+let navInstanceExists = false;
+
 // Top level container for all navigation elements and scenes
 @observer
 export default class NavContainer extends React.Component {
@@ -140,15 +143,26 @@ export default class NavContainer extends React.Component {
   }
 
   componentWillMount() {
+    if (navInstanceExists) {
+      throw new Error('You are attempting to create multiple instances of the nav container');
+    }
+    navInstanceExists = true;
     Dimensions.addEventListener('change', (event) => {
       const { height, width } = event.window;
       this.width = width;
       this.height = height;
     });
+    BackAndroid.addEventListener('hardwareBackPress', () => {
+      if (this.navState.front.previous) {
+        this.navState.pop();
+      }
+    });
   }
 
   componentWillUnmount() {
     Dimensions.removeEventListener('change');
+    BackAndroid.removeEventListener('hardwareBackPress');
+    navInstanceExists = false;
   }
 
   cards() {
