@@ -51,6 +51,10 @@ export default class NavTabBar extends React.Component {
   };
 
   get xform() {
+    if (!this.props.navState.front) {
+      return null;
+    }
+
     // if both the front and the back scenes have a tab bar, simply show
     const front = this.props.navState.front.element;
     const back = this.props.navState.back ? this.props.navState.back.element : null;

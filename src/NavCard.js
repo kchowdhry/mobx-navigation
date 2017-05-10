@@ -100,6 +100,10 @@ export default class NavCard extends React.Component {
     )
   }
 
+  componentDidMount() {
+    this.props.element.mounted = true;
+  }
+
   render() {
     return (
       <Animated.View style={[StyleSheet.absoluteFill, this.xform]}>

@@ -20,6 +20,8 @@ export default class NavElement {
   // The instance and ref are set shortly after the NavElement is constructed
   _instance: object;
   @observable ref: object = null;
+  // This is set when the NavCard encapsulating the element is mounted
+  @observable mounted: boolean = false;
 
   get instance() {
     return this._instance;
@@ -90,7 +92,7 @@ export default class NavElement {
   }
 
   get isFront(): boolean {
-    return this.navState.front.element === this;
+    return this.navState.front && this.navState.front.element === this;
   }
 
   get isBack(): boolean {

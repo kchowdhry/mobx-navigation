@@ -329,38 +329,40 @@ export class NavState {
         });
     }
 
-    // Move nodes to the correct z-index as necessary
-    if (this.motion === Motion.NONE) {
-      this.front = node;
-      this.back = null;
-    } else if (this.motion === Motion.SLIDE_ON) {
-      this.back = this.front;
-      this.front = node;
-    } else if (this.motion === Motion.SLIDE_OFF) {
-      this.back = node;
-    }
-
-    // TODO custom callbacks
-    if (this.motion === Motion.NONE) {
-      this.endTransition(node, oldFront);
-      return Promise.resolve();
-    }
-
-    let start = 0;
-    let end = 1;
-    if (this.motion === Motion.SLIDE_OFF) {
-      start = 1;
-      end = 0;
-    }
-    this.transitionValue = new Animated.Value(start);
     return new Promise((resolve) => {
-      Animated.timing(this.transitionValue, {
-        toValue: end,
-        duration: 200,
-        useNativeDriver: true,
-      }).start(() => {
-        this.endTransition(node, oldFront);
-        resolve();
+      when('nav card mounted', () => node.element.mounted, () => {
+        // Move nodes to the correct z-index as necessary
+        if (this.motion === Motion.NONE) {
+          this.front = node;
+          this.back = null;
+        } else if (this.motion === Motion.SLIDE_ON) {
+          this.back = this.front;
+          this.front = node;
+        } else if (this.motion === Motion.SLIDE_OFF) {
+          this.back = node;
+        }
+
+        // TODO custom callbacks
+        if (this.motion === Motion.NONE) {
+          this.endTransition(node, oldFront);
+          return Promise.resolve();
+        }
+
+        let start = 0;
+        let end = 1;
+        if (this.motion === Motion.SLIDE_OFF) {
+          start = 1;
+          end = 0;
+        }
+        this.transitionValue = new Animated.Value(start);
+        Animated.timing(this.transitionValue, {
+          toValue: end,
+          duration: 200,
+          useNativeDriver: true,
+        }).start(() => {
+          this.endTransition(node, oldFront);
+          resolve();
+        });
       });
     });
   }
