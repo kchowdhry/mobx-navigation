@@ -32,6 +32,12 @@ flexibility in rendering scenes to make things as performant as possible.
 
 ## Usage
 
+The bulk of the documentation is actually housed as code in the example project located in this repo
+[here](https://github.com/PlexChat/mobx-navigation/tree/master/example/src). The scenes and classes
+in there could use some organization (difficult because the feature set is so large), so changes to
+help shuffle and rename things would be appreciated. For additional exposition, or to get the gist of
+the library, keep reading.
+
 To get started with the library, you will need a `NavContainer` component somewhere near or at the
 top of the application render tree. If you wish to embed the `NavContainer` inside some other component,
 you may. This component, should have declared, as children, any `NavTab` elements you wish to exist
