@@ -345,7 +345,8 @@ export class NavState {
         // TODO custom callbacks
         if (this.motion === Motion.NONE) {
           this.endTransition(node, oldFront);
-          return Promise.resolve();
+          resolve();
+          return;
         }
 
         let start = 0;
@@ -429,7 +430,7 @@ export class NavState {
 
     const scene = this.getScene(sceneKey);
     if (!scene) {
-      return;
+      return Promise.reject();
     }
 
     const config = scene.config || {};

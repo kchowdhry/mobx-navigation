@@ -42,8 +42,8 @@ export default class NavElement {
 
   constructor(navState, node) {
     this.navState = navState;
-    navState.mergeNodeConfig(node.config);
-    this.navConfig = node.config;
+    this.navConfig = node.config ? node.config : {};
+    navState.mergeNodeConfig(this.navConfig);
     this.navProps = this.navConfig.initNavProps ? this.navConfig.initNavProps(node.props) : null;
     this.instance = this.createInstance(node.component, node.props);
     this.key = elementCount;

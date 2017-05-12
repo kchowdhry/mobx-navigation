@@ -79,7 +79,7 @@ export default class NavNode {
   }
 
   get isUnique() {
-    return this.element.navConfig.unique;
+    return this.config.unique;
   }
 
   // If this scene is used as the root of a tab, the configuration governing the tab are housed here
