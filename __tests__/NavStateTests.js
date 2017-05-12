@@ -40,6 +40,22 @@ class Unique extends React.Component {
   }
 }
 
+let cachedRefCount = 0;
+
+@scene('cached')
+class Cached extends React.Component {
+  static navConfig = {
+    cacheHint: props => props.key,
+  };
+  constructor(props) {
+    super(props);
+    cachedRefCount += 1;
+  }
+  render() {
+    return null;
+  }
+}
+
 const navStateBox = observable.box();
 
 const container = renderer.create(
@@ -111,5 +127,35 @@ describe('NavState', () => {
         }).catch(fail);
       }).catch(fail);
     });
+  });
+
+  it('should reuse a cached scene', () => {
+    return new Promise((resolve) => {
+      navState.push('cached', { key: '1' }).then(() => {
+        expect(navState.front.sceneKey).toBe('cached');
+        expect(cachedRefCount).toBe(1);
+        navState.pop().then(() => {
+          navState.push('cached', { key: '1' }).then(() => {
+            expect(navState.front.sceneKey).toBe('cached');
+            expect(cachedRefCount).toBe(1);
+            resolve();
+          });
+        });
+      });
+    })
+  });
+
+  it('should mount a separate cached scene', () => {
+    return new Promise((resolve) => {
+      navState.push('cached', { key: '1' }).then(() => {
+        expect(navState.front.sceneKey).toBe('cached');
+        expect(cachedRefCount).toBe(1);
+        navState.push('cached', { key: '2' }).then(() => {
+          expect(navState.front.sceneKey).toBe('cached');
+          expect(cachedRefCount).toBe(2);
+          resolve();
+        });
+      });
+    })
   });
 });
