@@ -8,8 +8,8 @@ const INSTANCE_FREE_WATERMARK = 20;
 export default class ElementPool {
   navState: NavState;
 
-  // Map from component reference to sets of string keys (effectively namespaces keys by component type)
-  nodeKeys: Map<object, Map<string, object>> = new Map();
+  // Map from scene key to sets of string keys (effectively namespaces keys by scene type)
+  nodeKeys: Map<string, Map<string, object>> = new Map();
 
   // Mobx observable maps do not allow object keys so we make the instance pool a custom observable
   atom = new Atom('Nav instance pool');
@@ -39,11 +39,11 @@ export default class ElementPool {
     return onscreen.concat(offscreen);
   }
 
-  hintToKey(hint: string, component: React.Component): object {
-    let keys = this.nodeKeys.get(component);
+  hintToKey(hint: string, sceneKey: string): object {
+    let keys = this.nodeKeys.get(sceneKey);
     if (!keys) {
       keys = new Map();
-      this.nodeKeys.set(component, keys);
+      this.nodeKeys.set(sceneKey, keys);
     }
 
     let key = keys.get(hint);
@@ -59,7 +59,7 @@ export default class ElementPool {
   retain(node: NavNode): NavElement {
     // The instance returned by this function will either be created inline or was cached already by a previous
     // nav node sharing the same hint as this one
-    let id = node.hint ? this.hintToKey(node.hint, node.component) : node;
+    let id = node.hint ? this.hintToKey(node.hint, node.sceneKey) : node;
 
     let value = this.elements.get(id);
     if (value) {
@@ -84,7 +84,7 @@ export default class ElementPool {
   }
 
   release(node: NavNode) {
-    let id = node.hint ? this.hintToKey(node.hint, node.component) : node;
+    let id = node.hint ? this.hintToKey(node.hint, node.sceneKey) : node;
 
     const value = this.elements.get(id);
     if (value) {

@@ -116,6 +116,7 @@ export function scene(key) {
       sceneRegistry[sceneKey] = {
         target,
         config: merged,
+        sceneKey,
       };
       target.navSceneKeys.push(sceneKey);
     });
@@ -139,6 +140,7 @@ export function scene(key) {
       sceneRegistry[key] = {
         target,
         config: baseConfig,
+        sceneKey: key,
       }
       target.navSceneKey = key;
       return target;

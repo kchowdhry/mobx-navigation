@@ -89,6 +89,7 @@ export default class NavNode {
     this.navState = navState;
     this.component = scene.target;
     this.config = scene.config;
+    this.sceneKey = scene.sceneKey;
     this.props = props;
     this.element = navState.elementPool.retain(this);
   }
