@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Button,
   Text,
+  TextInput,
   StyleSheet,
   View
 } from 'react-native';
@@ -100,6 +101,7 @@ class Tab1Scene1 extends React.Component {
         <Text>
           {this.props.navState.frontCustomConfig.myCustomConfig}
         </Text>
+        <TextInput style={{ height: 40, borderColor: 'blue', borderWidth: 1 }} value="Test tab bar visibility" />
         <Button title="Tab1Scene2" onPress={() => this.props.navState.push('Tab1Scene2')} />
       </View>
     );

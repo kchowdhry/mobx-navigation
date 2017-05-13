@@ -100,7 +100,7 @@ export default class ElementPool {
             Log.trace('Removing orphaned node ${toRemove}');
           }
         } else {
-          Log.trace(`Removing anonymous element ${node.componentName} from the pool`);
+          Log.trace(`Removing anonymous element ${node.sceneKey} from the pool`);
           this.atom.reportChanged();
           this.elements.delete(id);
         }

@@ -54,10 +54,6 @@ export default class NavNode {
     return this.component.wrappedComponent || this.component;
   }
 
-  get componentName() {
-    return this.component.navSceneKey;
-  }
-
   get hint() {
     if (this._hint) {
       return this._hint;
@@ -71,7 +67,7 @@ export default class NavNode {
       } else if (cacheHintType === 'string') {
         this._hint = this.config.cacheHint;
       } else if (cacheHintType !== 'undefined') {
-        Log.error(`Invalid cache hint type of ${cacheHintType} supplied to ${this.componentName}`);
+        Log.error(`Invalid cache hint type of ${cacheHintType} supplied to ${this.sceneKey}`);
       }
     }
 

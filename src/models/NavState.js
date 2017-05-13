@@ -101,7 +101,6 @@ export function scene(key) {
       return;
     }
 
-    target.navSceneKeys = [];
     Object.keys(baseMultiConfig).forEach((sceneKey) => {
       if (sceneRegistry[sceneKey]) {
         Log.error(`Attempting to register a scene with duplicate name ${sceneKey}`);
@@ -118,7 +117,6 @@ export function scene(key) {
         config: merged,
         sceneKey,
       };
-      target.navSceneKeys.push(sceneKey);
     });
     return target;
   } else {
@@ -142,7 +140,6 @@ export function scene(key) {
         config: baseConfig,
         sceneKey: key,
       }
-      target.navSceneKey = key;
       return target;
     }
   }
@@ -226,7 +223,7 @@ export class NavState {
   }
 
   get frontSceneKey() {
-    return this.front.component.navSceneKey;
+    return this.front.sceneKey;
   }
 
   get backCustomConfig() {
@@ -234,7 +231,7 @@ export class NavState {
   }
 
   get backSceneKey() {
-    return this.back ? this.back.component.navSceneKey : null;
+    return this.back ? this.back.sceneKey : null;
   }
 
   // Performs a 2-level object merge of a scene's configuration with the root one, applying templates as they
@@ -371,7 +368,7 @@ export class NavState {
   }
 
   @action endTransition = (node, oldFront) => {
-    Log.trace(`Transitioned to node ${node.componentName}/${node.hint || ''}`);
+    Log.trace(`Transitioned to node ${node.sceneKey}/${node.hint || ''}`);
     if (node.element.wrappedRef && node.element.wrappedRef.componentDidShow) {
       node.element.wrappedRef.componentDidShow();
     }

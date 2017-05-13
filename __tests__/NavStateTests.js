@@ -74,7 +74,6 @@ describe('NavState', () => {
   it('should construct a state with one scene', () => {
     expect(navState.front).toBeDefined();
     expect(navState.front.component).toBe(NullScene);
-    expect(navState.front.componentName).toBe('null1');
   });
 
   it('should push a new scene onto the stack', () => {
@@ -82,7 +81,7 @@ describe('NavState', () => {
     return new Promise((resolve) => {
       navState.push('null2').then(() => {
         expect(navState.front.component).toBe(NullScene2);
-        expect(navState.front.componentName).toBe('null2');
+        expect(navState.front.sceneKey).toBe('null2');
         resolve();
       }).catch(fail);
     });
@@ -102,11 +101,11 @@ describe('NavState', () => {
   it('should only push a unique scene once', () => {
     return new Promise((resolve) => {
       navState.push('unique').then(() => {
-        expect(navState.front.componentName).toBe('unique');
+        expect(navState.front.sceneKey).toBe('unique');
         expect(navState.front.isUnique).toBeTruthy();
         navState.push('unique').then(() => {
-          expect(navState.front.componentName).toBe('unique');
-          expect(navState.front.previous.componentName).not.toBe('unique');
+          expect(navState.front.sceneKey).toBe('unique');
+          expect(navState.front.previous.sceneKey).not.toBe('unique');
           resolve();
         }).catch(fail);
       }).catch(fail);
@@ -119,7 +118,7 @@ describe('NavState', () => {
         navState.push('null1').then(() => {
           navState.push('null2').then(() => {
             navState.push('unique').then(() => {
-              expect(navState.front.componentName).toBe('unique');
+              expect(navState.front.sceneKey).toBe('unique');
               expect(navState.front.next).not.toBeDefined();
               resolve();
             }).catch(fail);

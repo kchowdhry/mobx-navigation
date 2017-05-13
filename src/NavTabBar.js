@@ -2,10 +2,12 @@ import React from 'react';
 
 import {
   Animated,
+  Keyboard,
   StyleSheet,
   View,
 } from 'react-native';
 
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 
 import PropTypes from 'prop-types';
@@ -26,6 +28,13 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: 'white',
   },
+  offscreen: {
+    transform: [
+      {
+        translateX: 100000,
+      },
+    ],
+  }
 });
 
 @observer
@@ -50,9 +59,16 @@ export default class NavTabBar extends React.Component {
     style: View.propTypes.style,
   };
 
+  @observable keyboardVisible = false;
+
   get xform() {
     if (!this.props.navState.front) {
       return null;
+    }
+
+    // If the keyboard is visible, never display the tab bar
+    if (this.keyboardVisible) {
+      return styles.offscreen;
     }
 
     // if both the front and the back scenes have a tab bar, simply show
@@ -88,6 +104,16 @@ export default class NavTabBar extends React.Component {
 
   get tabs() {
     return React.Children.map(this.props.children, child => React.cloneElement(child, { ...this.props }));
+  }
+
+  componentWillMount() {
+    this.keyboardVisibleListener = Keyboard.addListener('keyboardWillShow', () => { this.keyboardVisible = true; });
+    this.keyboardNotVisibleListener = Keyboard.addListener('keyboardWillHide', () => { this.keyboardVisible = false; });
+  }
+
+  componentWillUnmount() {
+    this.keyboardVisibleListener.remove();
+    this.keyboardNotVisibleListener.remove();
   }
 
   render() {
