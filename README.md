@@ -131,6 +131,7 @@ export const defaultConfig = {
     right: 0,
     bottom: 0,
   },
+  navBarLeftDisabled: false, // Remove default back button
   navBarLeft: null,
   navBarLeftProps: null,
   navBarLeftStyle: {

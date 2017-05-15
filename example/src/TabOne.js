@@ -89,6 +89,7 @@ class Tab1Scene1 extends React.Component {
       tabAffinity: '1',
       tabBarVisible: true,
       navBarVisible: true,
+      navBarLeftDisabled: true,
       navBarStyle: {
         backgroundColor: 'red',
       }

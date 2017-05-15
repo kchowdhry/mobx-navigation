@@ -83,7 +83,7 @@ export default class NavBar extends React.Component {
   }
 
   get hasBack() {
-    return this.node && this.node.previous;
+    return this.node && this.node.previous && !this.node.config.navBarLeftDisabled;
   }
 
   render() {
