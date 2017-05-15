@@ -3,6 +3,7 @@ import React from 'react';
 import {
   Animated,
   Keyboard,
+  Platform,
   StyleSheet,
   View,
 } from 'react-native';
@@ -12,6 +13,7 @@ import { observer } from 'mobx-react';
 
 import PropTypes from 'prop-types';
 
+import Log from './Logger';
 import NavTab from './NavTab';
 
 const styles = StyleSheet.create({
@@ -107,8 +109,16 @@ export default class NavTabBar extends React.Component {
   }
 
   componentWillMount() {
-    this.keyboardVisibleListener = Keyboard.addListener('keyboardWillShow', () => { this.keyboardVisible = true; });
-    this.keyboardNotVisibleListener = Keyboard.addListener('keyboardWillHide', () => { this.keyboardVisible = false; });
+    // TODO: Hack, both events should be the "Will" variant of the event whenever the RN team manages to get around to
+    // fixing the "Will" events on Android.
+    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    this.keyboardVisibleListener = Keyboard.addListener(showEvent, () => {
+      this.keyboardVisible = true;
+    });
+    this.keyboardNotVisibleListener = Keyboard.addListener(hideEvent, () => {
+      this.keyboardVisible = false;
+    });
   }
 
   componentWillUnmount() {

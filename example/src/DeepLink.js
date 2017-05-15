@@ -10,32 +10,40 @@ import { scene } from '../..';
 
 import UniqueScene from './Unique';
 
-const SceneOne = scene('SceneOne')((props) => {
-  return (
-    <View>
-      <Text>
-        One
-      </Text>
-    </View>
-  )
-});
-SceneOne.navConfig = {
-  tabAffinity: '3',
-  navBarVisible: true,
-};
+@scene('SceneOne')
+class SceneOne extends React.Component {
+  static navConfig = {
+    tabAffinity: '3',
+    navBarVisible: true,
+  };
 
-const SceneTwo = scene('SceneTwo')((props) => {
-  return (
-    <View>
-      <Text>
-        Two
+  render() {
+    return (
+      <View>
+        <Text>
+          One
       </Text>
-    </View>
-  )
-});
-SceneTwo.navConfig = {
-  navBarVisible: true,
-};
+      </View>
+    );
+  }
+}
+
+@scene('SceneTwo')
+class SceneTwo extends React.Component {
+  static navConfig = {
+    navBarVisible: true,
+  };
+
+  render() {
+    return (
+      <View>
+        <Text>
+          Two
+      </Text>
+      </View>
+    );
+  }
+}
 
 @scene('DeepLink') @observer
 export default class DeepLink extends React.Component {

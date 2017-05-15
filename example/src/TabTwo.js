@@ -8,35 +8,43 @@ import { inject, observer } from 'mobx-react';
 
 import { scene } from '../..';
 
-export const Tab2 = scene('Tab2')((props) => {
-  const onPress = () => {
-    props.navState.push('Tab2Scene1');
+@scene('Tab2')
+export class Tab2 extends React.Component {
+  static navConfig = {
+    tabAffinity: '2',
+    tabBarVisible: true,
   };
 
-  const onPress2 = () => {
-    props.navState.push('CachedScene', { key: 'key1' });
+  onPress = () => {
+    this.props.navState.push('Tab2Scene1');
   };
 
-  const onPress3 = () => {
-    props.navState.push('CachedScene', { key: 'key2' });
+  onPress2 = () => {
+    this.props.navState.push('CachedScene', { key: 'key1' });
   };
 
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <Button title={'Tab 2'} onPress={onPress} />
-      <Button title={'Cached scene'} onPress={onPress2} />
-      <Button title={'Different scene'} onPress={onPress3} />
-    </View>
-  );
-});
+  onPress3 = () => {
+    this.props.navState.push('CachedScene', { key: 'key2' });
+  };
 
-Tab2.navConfig = {
-  tabAffinity: '2',
-  tabBarVisible: true,
-};
+  render() {
+    return (
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
+        <Button title={'Tab 2'} onPress={this.onPress} />
+        <Button title={'Cached scene'} onPress={this.onPress2} />
+        <Button title={'Different scene'} onPress={this.onPress3} />
+      </View>
+    );
+  }
+}
 
 @scene('Tab2Scene1') @inject('testStore') @observer
 export class Tab2Scene1 extends React.Component {
+  static navConfig = {
+    navBarVisible: true,
+    tabAffinity: '2',
+  };
+
   onPress = () => {
     this.props.navState.tabRoot('3');
   }
@@ -66,8 +74,3 @@ export class Tab2Scene1 extends React.Component {
     );
   }
 }
-
-Tab2Scene1.navConfig = {
-  navBarVisible: true,
-  tabAffinity: '2',
-};

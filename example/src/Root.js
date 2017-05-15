@@ -16,58 +16,70 @@ import { Tab1 } from './TabOne';
 import { Tab2 } from './TabTwo';
 import { Tab3 } from './TabThree';
 
-const TestScene = scene('TestScene')((props) => {
-  const onPress = () => {
-    props.navState.push('TestScene2');
+@scene('TestScene')
+class TestScene extends React.Component {
+  static navConfig = {
+    // Root scenes are housed on the root stack prior to the existence of the tab bar
+    isRootScene: true
   };
 
-  const onPress2 = () => {
-    props.navState.replace('TestScene3');
+  onPress = () => {
+    this.props.navState.push('TestScene2');
   };
 
-  const onPress3 = () => {
-    props.navState.tabs();
+  onPress2 = () => {
+    this.props.navState.replace('TestScene3');
+  };
+
+  onPress3 = () => {
+    this.props.navState.tabs();
   }
 
-  return (
-    <View style={{ flex: 1, backgroundColor: 'orange' }}>
-      <Button title={props.text} onPress={onPress} />
-      <Button title={'Test replace'} onPress={onPress2} />
-      <Button title={'Tabs!'} onPress={onPress3} />
-    </View>
-  )
-});
-TestScene.navConfig = {
-  // Root scenes are housed on the root stack prior to the existence of the tab bar
-  isRootScene: true
-};
+  render() {
 
-const TestScene2 = scene('TestScene2')((props) => {
-  const onPress = () => {
-    props.navState.pop();
-  };
-
-  return (
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <Button title={'Test 2'} onPress={onPress} />
-    </View>
-  )
-});
-TestScene2.navConfig = {
-  tabBarVisible: true,
+    return (
+      <View style={{ flex: 1, backgroundColor: 'orange' }}>
+        <Button title={this.props.text} onPress={this.onPress} />
+        <Button title={'Test replace'} onPress={this.onPress2} />
+        <Button title={'Tabs!'} onPress={this.onPress3} />
+      </View>
+    );
+  }
 }
 
-const TestScene3 = scene('TestScene3')((props) => {
-  const onPress = () => {
-    props.navState.push('TestScene', { text: 'came from 3' });
+@scene('TestScene2')
+class TestScene2 extends React.Component {
+  static navConfig = {
+    tabBarVisible: true,
   };
 
-  return (
-    <View style={{ flex: 1, backgroundColor: 'orange' }}>
-      <Button title={'Test 3'} onPress={onPress} />
-    </View>
-  )
-});
+  onPress = () => {
+    this.props.navState.pop();
+  };
+
+  render() {
+    return (
+      <View style={{ flex: 1, backgroundColor: 'white' }}>
+        <Button title={'Test 2'} onPress={this.onPress} />
+      </View>
+    );
+  }
+}
+
+@scene('TestScene3')
+class TestScene3 extends React.Component {
+  onPress = () => {
+    this.props.navState.push('TestScene', { text: 'came from 3' });
+  };
+
+  render() {
+    return (
+      <View style={{ flex: 1, backgroundColor: 'orange' }}>
+        <Button title={'Test 3'} onPress={onPress} />
+      </View>
+    );
+  }
+}
 
 const TabCommon = (props) => {
   return (
