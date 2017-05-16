@@ -293,6 +293,9 @@ cause the decorated child component to register itself with an existing scene in
 and lifecycle events for that nearest parent scene will automatically trigger lifecycle events defined on the
 child.
 
+Note that for both the scene and the child components, you are not required to define all, or any, of the
+custom lifecycle events. Only what you need! Examples of these events firing can be seen in the example project.
+
 ## Implementation Summary
 
 Conceptually, `mobx-navigation` renders scenes in a relatively straightforward manner:

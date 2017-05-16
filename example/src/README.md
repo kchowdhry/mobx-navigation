@@ -19,6 +19,9 @@ links to `CachedScene.js`, which provides a `cacheHint` in its `navConfig`. The
 `CachedScene` has state housed on the component so you can visually see that the
 scene is recycled even when its popped off the stack and renavigated to.
 
+The root of the second tab also contains to child components which demonstrate
+the propagation of mobx-navigation lifecycle events beyond the root @scene component.
+
 ## `TabThree.js`
 
 The third tab also contains a link to `CachedScene` which shows that the same cached
