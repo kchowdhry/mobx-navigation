@@ -278,6 +278,21 @@ decorator does not have any arguments.
 A scene may have *both* a `navConfig` and a `multiNavConfig`. In this case, the `navConfig` is treated as
 a template that is applied to all configurations passed in the `multiNavConfig`.
 
+### Lifecycle Events
+
+Components decorated with the `@scene` decorator will automatically have access to four additional lifecycle
+events: `componentWillShow`, `componentDidShow`, `componentWillHide`, and `componentDidHide`. These events
+occur analogously to the standard React lifecycle events at the start and end of navigation transitions. Note
+that in all cases, the component will have already rendered, either onscreen or offscreen so `mount` events
+are guaranteed to happen first before any `show` events and `unmount` events will always occur after the `hide`
+events.
+
+If you want to access these lifecycle events from any child component, you should do so via the `@child`
+decorator which should go before any other mobx-react decorators (aka, it should be applied last). This will
+cause the decorated child component to register itself with an existing scene in its React context if it exists,
+and lifecycle events for that nearest parent scene will automatically trigger lifecycle events defined on the
+child.
+
 ## Implementation Summary
 
 Conceptually, `mobx-navigation` renders scenes in a relatively straightforward manner:

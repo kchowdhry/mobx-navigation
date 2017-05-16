@@ -6,7 +6,63 @@ import {
 } from 'react-native';
 import { inject, observer } from 'mobx-react';
 
-import { scene } from '../..';
+import { child, scene } from '../..';
+
+@child class Child1 extends React.Component {
+  componentWillHide() {
+    console.log('Child 1 hiding');
+  }
+
+  componentDidHide() {
+    console.log('Child 1 hid');
+  }
+
+  componentWillShow() {
+    console.log('Child 1 showing');
+  }
+
+  componentDidShow() {
+    console.log('Child 1 shown');
+  }
+
+  render() {
+    return (
+      <View>
+        <Text>
+          {'Child 1'}
+        </Text>
+      </View>
+    );
+  }
+}
+
+@child class Child2 extends React.Component {
+  componentWillHide() {
+    console.log('Child 2 hiding');
+  }
+
+  componentDidHide() {
+    console.log('Child 2 hid');
+  }
+
+  componentWillShow() {
+    console.log('Child 2 showing');
+  }
+
+  componentDidShow() {
+    console.log('Child 2 shown');
+  }
+
+  render() {
+    return (
+      <View>
+        <Text>
+          {'Child 2'}
+        </Text>
+      </View>
+    );
+  }
+}
 
 @scene('Tab2')
 export class Tab2 extends React.Component {
@@ -33,6 +89,8 @@ export class Tab2 extends React.Component {
         <Button title={'Tab 2'} onPress={this.onPress} />
         <Button title={'Cached scene'} onPress={this.onPress2} />
         <Button title={'Different scene'} onPress={this.onPress3} />
+        <Child1 />
+        <Child2 />
       </View>
     );
   }

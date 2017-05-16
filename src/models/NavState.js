@@ -1,5 +1,6 @@
 import { action, observable, untracked, when } from 'mobx';
 import { Animated, StatusBar } from 'react-native';
+import PropTypes from 'prop-types';
 
 import ElementPool from './ElementPool';
 import NavNode from './NavNode';
@@ -69,6 +70,23 @@ export function mergeValues(left, right) {
   return right;
 }
 
+function augmentSceneContext(target) {
+  const base = target.childContextTypes || {};
+  base._mobxNavParent = PropTypes.object;
+  target.childContextTypes = base;
+  const baseGet = target.prototype.getChildContext;
+  target.prototype.getChildContext = baseGet ? function() {
+    const baseContext = baseGet.call(this);
+    baseContext._mobxNavParent = this;
+    return baseContext;
+  } : function() {
+    return {
+      _mobxNavParent: this,
+    }
+  }
+  return target;
+}
+
 export function scene(key) {
   if (typeof arguments[0] !== 'string') {
     // For decorators without arguments, the first parameter is actually a misnomer and not a key but the target
@@ -118,7 +136,7 @@ export function scene(key) {
         sceneKey,
       };
     });
-    return target;
+    return augmentSceneContext(target);
   } else {
     return (target) => {
       if (sceneRegistry[key]) {
@@ -140,9 +158,46 @@ export function scene(key) {
         config: baseConfig,
         sceneKey: key,
       }
-      return target;
+      return augmentSceneContext(target);
     }
   }
+}
+
+function registerChildMixin() {
+  Log.trace(`Child ${this.displayName || this.name || this.constructor.name} mounted`);
+  if (this.context._mobxNavParent) {
+    // We're currently mounted inside a registered mobx navigation scene. Register ourselves
+    if (!this.context._mobxNavParent._mobxNavChildren) {
+      this.context._mobxNavParent._mobxNavChildren = [];
+    }
+    this.context._mobxNavParent._mobxNavChildren.push(this);
+  }
+}
+
+export function child(target) {
+  if (!target) {
+    Log.error('Child decorator attached to invalid target');
+  }
+
+  if (typeof target === 'function' && (!target.prototype || !target.prototype.render)) {
+    Log.error('Child decorator cannot be applied to stateless functional components');
+  }
+
+  // This is a react component. Modify it's prototype
+  const base = target.prototype.componentWillMount;
+  target.prototype.componentWillMount = base ? function() {
+    base.call(this);
+    registerChildMixin.call(this);
+  } : function() {
+    registerChildMixin.call(this);
+  }
+
+  // Thread the scene's context parameter through
+  const baseContextTypes = target.contextTypes || {};
+  baseContextTypes._mobxNavParent = PropTypes.object;
+  target.contextTypes = baseContextTypes;
+
+  return target;
 }
 
 export class NavState {
@@ -289,6 +344,19 @@ export class NavState {
     nodeConfig._merged = true;
   }
 
+  propagateLifecycleEvent(instance, eventName) {
+    if (instance._mobxNavChildren) {
+      instance._mobxNavChildren.forEach((child) => {
+        if (child[eventName]) {
+          child[eventName].call(child);
+        }
+      })
+    }
+    if (instance[eventName]) {
+      instance[eventName].call(instance);
+    }
+  }
+
   // Returns a promise that resolves when the transition to the new node has completed. In the promise
   // resolution, it is expected that the caller clean up any nodes that are now orphaned
   @action startTransition(node: NavNode): Promise<> {
@@ -311,23 +379,18 @@ export class NavState {
 
     const oldFront = this.front;
     if (this.front) {
-      const oldFrontComponent = this.front.wrappedComponent;
-      if (oldFrontComponent.prototype.componentWillHide) {
-        when('node ref available', () => !!oldFront.element.wrappedRef,
-          () => {
-            oldFront.element.wrappedRef.componentWillHide();
-          });
-      }
+      when('node ref available', () => !!oldFront.element.wrappedRef,
+        () => {
+          this.propagateLifecycleEvent(oldFront.element.wrappedRef, 'componentWillHide');
+        });
     }
 
     const component = node.wrappedComponent;
-    if (component.prototype.componentWillShow) {
-      // We perform the componentWillShow as a mobx reaction because it isn't immediately available
-      when('node ref available', () => !!node.element.ref,
-        () => {
-          node.element.wrappedRef.componentWillShow();
-        });
-    }
+    // We perform the componentWillShow as a mobx reaction because it isn't immediately available
+    when('node ref available', () => !!node.element.ref,
+      () => {
+        this.propagateLifecycleEvent(node.element.wrappedRef, 'componentWillShow');
+      });
 
     return new Promise((resolve) => {
       when('nav card mounted', () => node.element.mounted, () => {
@@ -370,11 +433,11 @@ export class NavState {
 
   @action endTransition = (node, oldFront) => {
     Log.trace(`Transitioned to node ${node.sceneKey}/${node.hint || ''}`);
-    if (node.element.wrappedRef && node.element.wrappedRef.componentDidShow) {
-      node.element.wrappedRef.componentDidShow();
+    if (node.element.wrappedRef) {
+      this.propagateLifecycleEvent(node.element.wrappedRef, 'componentDidShow');
     }
-    if (oldFront && oldFront.element.wrappedRef && oldFront.element.wrappedRef.componentDidHide) {
-      oldFront.element.wrappedRef.componentDidHide();
+    if (oldFront && oldFront.element.wrappedRef) {
+      this.propagateLifecycleEvent(oldFront.element.wrappedRef, 'componentDidHide');
     }
     if (node.element.navConfig.statusBarStyle !== this.currentStatusBarStyle) {
       StatusBar.setBarStyle(node.element.navConfig.statusBarStyle);
