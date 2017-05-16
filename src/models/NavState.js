@@ -351,6 +351,16 @@ export class NavState {
           child[eventName].call(child);
         }
       })
+    } else if (instance._reactInternalInstance && instance._reactInternalInstance._context &&
+               instance._reactInternalInstance._context._mobxNavParent) {
+      const children = instance._reactInternalInstance._context._mobxNavParent._mobxNavChildren;
+      if (children) {
+        children.forEach((child) => {
+          if (child[eventName]) {
+            child[eventName].call(child);
+          }
+        });
+      }
     }
     if (instance[eventName]) {
       instance[eventName].call(instance);

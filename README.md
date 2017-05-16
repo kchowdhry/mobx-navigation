@@ -288,7 +288,7 @@ are guaranteed to happen first before any `show` events and `unmount` events wil
 events.
 
 If you want to access these lifecycle events from any child component, you should do so via the `@child`
-decorator which should go before any other mobx-react decorators (aka, it should be applied last). This will
+decorator which should go after all the other mobx-react decorators (aka, it should be applied first). This will
 cause the decorated child component to register itself with an existing scene in its React context if it exists,
 and lifecycle events for that nearest parent scene will automatically trigger lifecycle events defined on the
 child.
