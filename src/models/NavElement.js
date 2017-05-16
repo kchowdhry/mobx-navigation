@@ -72,7 +72,7 @@ export default class NavElement {
   }
 
   get tabBarVisible(): boolean {
-    return this.navConfig.tabBarVisible;
+    return this.navConfig.tabBarVisible && !this.navState.keyboardVisible;
   }
 
   get navBarVisible(): boolean {

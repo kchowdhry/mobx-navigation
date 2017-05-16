@@ -61,7 +61,6 @@ export default class NavTabBar extends React.Component {
     style: View.propTypes.style,
   };
 
-  @observable keyboardVisible = false;
 
   get xform() {
     if (!this.props.navState.front) {
@@ -69,7 +68,7 @@ export default class NavTabBar extends React.Component {
     }
 
     // If the keyboard is visible, never display the tab bar
-    if (this.keyboardVisible) {
+    if (this.props.navState.keyboardVisible) {
       return styles.offscreen;
     }
 
@@ -114,10 +113,10 @@ export default class NavTabBar extends React.Component {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
     const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
     this.keyboardVisibleListener = Keyboard.addListener(showEvent, () => {
-      this.keyboardVisible = true;
+      this.props.navState.keyboardVisible = true;
     });
     this.keyboardNotVisibleListener = Keyboard.addListener(hideEvent, () => {
-      this.keyboardVisible = false;
+      this.props.navState.keyboardVisible = false;
     });
   }
 

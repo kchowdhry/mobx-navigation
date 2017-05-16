@@ -98,7 +98,7 @@ class Tab1Scene1 extends React.Component {
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor: 'green' }}>
         <Text>
           {this.props.navState.frontCustomConfig.myCustomConfig}
         </Text>

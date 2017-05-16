@@ -147,6 +147,7 @@ export function scene(key) {
 
 export class NavState {
   @observable transitionInProgress: boolean = false;
+  @observable keyboardVisible: boolean = false;
 
   elementPool: ElementPool = new ElementPool(this);
 
