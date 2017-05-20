@@ -116,6 +116,7 @@ export default class ElementPool {
     Log.info('Flushing all elements from the element pool');
     this.elements = new Map();
     this.orphanedElements = new Set();
+    this.nodeKeys = new Map();
     this.atom.reportChanged();
   }
 }
