@@ -569,7 +569,7 @@ export class NavState {
   }
 
   @action popTo = (sceneKey: string) => {
-    if (this.transitionInProgress) {
+    if (this.transitionInProgress || sceneKey === this.front.sceneKey) {
       return Promise.resolve();
     }
 
