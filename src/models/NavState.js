@@ -523,7 +523,7 @@ export class NavState {
     } else {
       // This scene hasn't specified that it has an affinity for any particular tab. Push it onto the current
       // active tab
-      tail = targetTab === '' ? this.rootNode.tail : this.tabNodes.get(targetTab).tail;
+      tail = targetTab ? this.tabNodes.get(targetTab).tail : this.rootNode.tail;
     }
 
     tail.next = node;
