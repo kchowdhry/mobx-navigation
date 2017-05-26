@@ -204,7 +204,7 @@ export class NavState {
   @observable transitionInProgress: boolean = false;
   @observable keyboardVisible: boolean = false;
 
-  elementPool: ElementPool = new ElementPool(this);
+  elementPool: ElementPool;
 
   rootNode: NavNode;
 
@@ -235,7 +235,8 @@ export class NavState {
   multistepInProgress: boolean = false;
 
   // See propTypes and default config in NavContainer
-  constructor(config, templates) {
+  constructor(config, templates, cacheWatermark = 8) {
+    this.elementPool = new ElementPool(this, cacheWatermark);
     if (!config.initialScene) {
       Log.error('Attempted to construct a NavState without an initial scene');
       return;

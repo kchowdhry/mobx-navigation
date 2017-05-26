@@ -2,11 +2,11 @@ import { Atom } from 'mobx';
 import NavElement from './NavElement';
 import Log from '../Logger';
 
-// Keep this many orphaned instances around before starting to relaim scene instances in memory
-const INSTANCE_FREE_WATERMARK = 20;
 
 export default class ElementPool {
   navState: NavState;
+  // Keep this many orphaned instances around before starting to relaim scene instances in memory
+  cacheWatermark: number;
 
   // Map from scene key to sets of string keys (effectively namespaces keys by scene type)
   nodeKeys: Map<string, Map<string, object>> = new Map();
@@ -18,7 +18,8 @@ export default class ElementPool {
   // Set of keys that are currently orphaned
   orphanedElements = new Set();
 
-  constructor(navState: NavState) {
+  constructor(navState: NavState, cacheWatermark: number) {
+    this.cacheWatermark = cacheWatermark
     this.navState = navState;
   }
 
@@ -92,7 +93,7 @@ export default class ElementPool {
       if (value.refCount === 0) {
         if (node.hint) {
           this.orphanedElements.add(node.hint);
-          if (this.orphanedElements.size > INSTANCE_FREE_WATERMARK) {
+          if (this.orphanedElements.size > this.cacheWatermark) {
             // Remove the oldest orphaned element from the pool
             const toRemove = this.orphanedElements.values().next().value;
             this.atom.reportChanged();

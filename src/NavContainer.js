@@ -129,10 +129,12 @@ export default class NavContainer extends React.Component {
     Object.keys(defaultConfig).forEach((key) => {
       config[key] = mergeValues(defaultConfig[key], config[key]);
     });
-    // Unset templates as this is not an actual configuration value
+    // Unset templates and cacheWatermark as these are not scene configuration values
     config.templates = undefined;
+    config.cacheWatermark = undefined;
+    const cacheWatermark = props.cacheWatermark ? props.cacheWatermark : 8;
 
-    this.navState = new NavState(config, props.templates);
+    this.navState = new NavState(config, props.templates, cacheWatermark);
     if (typeof props.navStateRef === 'function') {
       props.navStateRef(this.navState);
     }

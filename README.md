@@ -251,6 +251,9 @@ cache is full, so that if someone navigates to the same profile again, no work n
 cache hints are *automatically namespaced* so you should not need to include the scene name or component type
 in the cache hint itself.
 
+By default, `mobx-navigation` retains 8 unique scenes in memory but this can be overridden by specifying the
+`cacheWatermark` prop on the `NavContainer`.
+
 ### Multi-configs
 
 Often, one may wish to have a single component used for multiple scenes but with different navigation configs.
