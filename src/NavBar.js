@@ -38,11 +38,12 @@ class BackButton extends React.Component {
 
   render() {
     return (
-      <View style={this.props.leftStyle}>
-        <TouchableOpacity onPress={this.onPress}>
-          {this.contents}
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={this.props.leftStyle}
+        onPress={this.onPress}
+      >
+        {this.contents}
+      </TouchableOpacity>
     );
   }
 }
