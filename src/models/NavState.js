@@ -540,7 +540,7 @@ export class NavState {
   }
 
   // By default, pops a single scene from the stack. If a number is supplied, it will pop that many scenes
-  @action pop = (sceneCount: number = 1) => {
+  @action pop = (sceneCount: number = 1, motion = Motion.SLIDE_OFF) => {
     if (this.transitionInProgress) {
       return Promise.resolve();
     }
@@ -550,7 +550,7 @@ export class NavState {
       return Promise.reject();
     }
 
-    this.motion = Motion.SLIDE_OFF;
+    this.motion = motion;
 
     let current = this.front;
     for (let i = 0; i < sceneCount; i += 1) {
