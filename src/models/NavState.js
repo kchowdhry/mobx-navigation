@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import ElementPool from './ElementPool';
 import NavNode from './NavNode';
 import Log from '../Logger';
+const HIGH_WATER_MARK = 10;
+const LOW_WATER_MARK = 2;
 
 // Conceptually, a scene graph looks like a acyclic graph with a single root. The data structure defined
 // by this class needs to support the following operations:
@@ -203,7 +205,6 @@ export function child(target) {
 export class NavState {
   @observable transitionInProgress: boolean = false;
   @observable keyboardVisible: boolean = false;
-
   elementPool: ElementPool;
 
   rootNode: NavNode;
@@ -234,9 +235,10 @@ export class NavState {
   // actual operations on the scene animations themselves
   multistepInProgress: boolean = false;
 
+
   // See propTypes and default config in NavContainer
-  constructor(config, templates, cacheWatermark = 8) {
-    this.elementPool = new ElementPool(this, cacheWatermark);
+  constructor(config, templates, cacheWatermark = HIGH_WATER_MARK) {
+    this.elementPool = new ElementPool(this, cacheWatermark, LOW_WATER_MARK);
     if (!config.initialScene) {
       Log.error('Attempted to construct a NavState without an initial scene');
       return;

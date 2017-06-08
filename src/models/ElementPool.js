@@ -7,6 +7,7 @@ export default class ElementPool {
   navState: NavState;
   // Keep this many orphaned instances around before starting to relaim scene instances in memory
   cacheWatermark: number;
+  lowWaterMark: number;
 
   // Map from scene key to sets of string keys (effectively namespaces keys by scene type)
   nodeKeys: Map<string, Map<string, object>> = new Map();
@@ -18,8 +19,9 @@ export default class ElementPool {
   // Set of keys that are currently orphaned
   orphanedElements = new Set();
 
-  constructor(navState: NavState, cacheWatermark: number) {
-    this.cacheWatermark = cacheWatermark
+  constructor(navState: NavState, cacheWatermark: number, lowWaterMark: number) {
+    this.cacheWatermark = cacheWatermark;
+    this.lowWatermark = lowWaterMark
     this.navState = navState;
   }
 
@@ -112,12 +114,12 @@ export default class ElementPool {
   }
 
   decrementWaterMark() {
-    if(this.cacheWatermark > 2)
+    if(this.cacheWatermark > this.lowWaterMark)
       this.cacheWatermark -= 1;
   }
 
   evict() {
-    if (this.orphanedElements.size > 2) {
+    if (this.orphanedElements.size > this.lowWaterMark) {
       // Remove the oldest orphaned element from the pool
       const toRemove = this.orphanedElements.values().next().value;
       this.atom.reportChanged();
