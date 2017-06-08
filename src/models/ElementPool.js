@@ -111,6 +111,21 @@ export default class ElementPool {
     }
   }
 
+  decrementWaterMark() {
+    if(this.cacheWatermark > 2)
+      this.cacheWatermark -= 1;
+  }
+
+  evict() {
+    if (this.orphanedElements.size > 2) {
+      // Remove the oldest orphaned element from the pool
+      const toRemove = this.orphanedElements.values().next().value;
+      this.atom.reportChanged();
+      this.elements.delete(toRemove);
+      Log.trace('Removing orphaned node ${toRemove}');
+    }
+  }
+
   // Note, in the same callback as the invocation of this function, new scenes should be added
   // afterwards so that the root nav container has something to display
   flush() {

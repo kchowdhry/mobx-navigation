@@ -707,6 +707,14 @@ export class NavState {
     return this.startTransition(this.rootNode);
   }
 
+  @action decrementWaterMark = () => {
+    this.elementPool.decrementWaterMark();
+  }
+
+  @action evict = () => {
+    this.elementPool.evict();
+  }
+
   // This function performs a multi-step transition where all the steps are functions
   // that execute the various transition types above
   @action multistep = (steps: Array = []) => {
