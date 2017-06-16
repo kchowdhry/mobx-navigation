@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  BackAndroid,
+  BackHandler,
   Dimensions,
   Platform,
   StyleSheet,
@@ -155,7 +155,7 @@ export default class NavContainer extends React.Component {
       this.width = width;
       this.height = height;
     });
-    BackAndroid.addEventListener('hardwareBackPress', () => {
+    BackHandler.addEventListener('hardwareBackPress', () => {
       if (this.navState.front.previous) {
         this.navState.pop();
         return true;
@@ -165,7 +165,7 @@ export default class NavContainer extends React.Component {
 
   componentWillUnmount() {
     Dimensions.removeEventListener('change');
-    BackAndroid.removeEventListener('hardwareBackPress');
+    BackHandler.removeEventListener('hardwareBackPress');
     navInstanceExists = false;
   }
 
