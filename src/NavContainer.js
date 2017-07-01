@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   BackHandler,
-  Dimensions,
   Platform,
   StyleSheet,
   View
@@ -120,8 +119,8 @@ export default class NavContainer extends React.Component {
     logLevel: PropTypes.number,
   };
 
-  @observable width;
-  @observable height;
+  @observable width = 0;
+  @observable height = 0;
 
   constructor(props) {
     super(props);
@@ -140,9 +139,6 @@ export default class NavContainer extends React.Component {
     }
 
     Log.debug('Initializing nav container with configuration: ', config);
-    const { height, width } = Dimensions.get('window');
-    this.width = width;
-    this.height = height;
   }
 
   componentWillMount() {
@@ -150,11 +146,6 @@ export default class NavContainer extends React.Component {
       throw new Error('You are attempting to create multiple instances of the nav container');
     }
     navInstanceExists = true;
-    Dimensions.addEventListener('change', (event) => {
-      const { height, width } = event.window;
-      this.width = width;
-      this.height = height;
-    });
     BackHandler.addEventListener('hardwareBackPress', () => {
       if (this.navState.front.previous) {
         this.navState.pop();
@@ -164,7 +155,6 @@ export default class NavContainer extends React.Component {
   }
 
   componentWillUnmount() {
-    Dimensions.removeEventListener('change');
     BackHandler.removeEventListener('hardwareBackPress');
     navInstanceExists = false;
   }
@@ -180,10 +170,19 @@ export default class NavContainer extends React.Component {
       />);
   }
 
+  containerOnLayout = (e) => {
+    const { width, height } = e.nativeEvent.layout;
+    this.width = width;
+    this.height = height;
+  };
+
   render() {
     return (
       <Provider navState={this.navState}>
-        <View style={{ flex: 1 }}>
+        <View
+          style={{ flex: 1 }}
+          onLayout={this.containerOnLayout}
+        >
           {this.cards()}
           <NavTabBar navState={this.navState} style={this.props.tabStyle} height={this.height} width={this.width}>
             {this.props.children}
