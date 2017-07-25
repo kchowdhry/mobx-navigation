@@ -691,23 +691,27 @@ export class NavState {
   }
 
   @action reset = () => {
-    return new Promise((resolve, reject) => {
-      this.rootNode = new NavNode(this, {
-        target: this.config.initialScene,
-        config: this.config.initialScene.navConfig,
-      }, this.config.initialProps);
-
-      this.motion = Motion.NONE;
-      this.startTransition(this.rootNode).then(() => {
-        this.elementPool.flush();
-        this.tabNodes = new Map();
-        this.transitionValue = new Animated.Value(1);
-        this.tabConfigs.forEach((config, name) => {
-          this.addTab(config);
-        });
-        resolve();
-      }).catch(reject);
+    this.elementPool.elements.forEach((element) => {
+      const ref = element.wrappedRef;
+      if (ref) {
+        this.propagateLifecycleEvent(ref, 'componentWillHide');
+        this.propagateLifecycleEvent(ref, 'componentDidHide');
+      }
     });
+    this.elementPool.flush();
+    this.tabNodes = new Map();
+    this.transitionValue = new Animated.Value(1);
+    this.tabConfigs.forEach((config, name) => {
+      this.addTab(config);
+    });
+
+    this.rootNode = new NavNode(this, {
+      target: this.config.initialScene,
+      config: this.config.initialScene.navConfig,
+    }, this.config.initialProps);
+
+    this.motion = Motion.NONE;
+    return this.startTransition(this.rootNode);
   }
 
   @action decrementWaterMark = () => {
