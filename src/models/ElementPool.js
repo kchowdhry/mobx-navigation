@@ -108,8 +108,6 @@ export default class ElementPool {
           this.elements.delete(id);
         }
       }
-    } else {
-      console.error(`Attempted to release node ${node.hint} which was not in the instance pool`);
     }
   }
 
