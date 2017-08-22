@@ -94,7 +94,7 @@ export default class ElementPool {
       value.refCount -= 1;
       if (value.refCount === 0) {
         if (node.hint) {
-          this.orphanedElements.add(node.hint);
+          this.orphanedElements.add(id);
           if (this.orphanedElements.size > this.cacheWatermark) {
             // Remove the oldest orphaned element from the pool
             const toRemove = this.orphanedElements.values().next().value;

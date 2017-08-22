@@ -613,6 +613,9 @@ export class NavState {
     }
 
     const currentActive = this.front;
+    currentActive.next = null;
+    this.elementPool.release(currentActive);
+
     const newActive = new NavNode(this, scene, props);
     if (currentActive.previous) {
       currentActive.previous.next = newActive;
