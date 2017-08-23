@@ -71,6 +71,18 @@ export default class NavElement {
     });
   }
 
+  update(node) {
+    this.navConfig = node.config ? node.config : {};
+    this.navState.mergeNodeConfig(this.navConfig);
+    this.navProps = this.navConfig.initNavProps ? this.navConfig.initNavProps(node.props) : null;
+
+    this.instance = React.cloneElement(this._instance, {
+      navState: this.navState,
+      navProps: this.navProps,
+      ...node.props,
+    });
+  }
+
   get tabBarVisible(): boolean {
     return this.navConfig.tabBarVisible && !this.navState.keyboardVisible;
   }
