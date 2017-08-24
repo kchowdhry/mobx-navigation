@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { observable } from 'mobx';
+import shallowEqual from 'fbjs/lib/shallowEqual';
 
 import Log from '../Logger';
 
@@ -72,15 +73,28 @@ export default class NavElement {
   }
 
   update(node) {
-    this.navConfig = node.config ? node.config : {};
-    this.navState.mergeNodeConfig(this.navConfig);
-    this.navProps = this.navConfig.initNavProps ? this.navConfig.initNavProps(node.props) : null;
+    const newNavConfig = node.config ? node.config : {};
+    this.navState.mergeNodeConfig(newNavConfig);
+    if (!shallowEqual(this.navConfig, newNavConfig)) {
+      this.navConfig = newNavConfig;
+    }
 
-    this.instance = React.cloneElement(this._instance, {
+    const newNavProps = this.navConfig.initNavProps ? this.navConfig.initNavProps(node.props) : null;
+    if (!shallowEqual(this.navProps, newNavProps)) {
+      this.navProps = newNavProps;
+    }
+
+    const newProps = {
       navState: this.navState,
       navProps: this.navProps,
       ...node.props,
-    });
+    };
+
+    if (shallowEqual(this._instance.props, newProps)) {
+      return;
+    }
+
+    this.instance = React.cloneElement(this._instance, newProps);
   }
 
   get tabBarVisible(): boolean {
