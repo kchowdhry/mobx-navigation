@@ -3,7 +3,8 @@ import {
   BackHandler,
   Platform,
   StyleSheet,
-  View
+  View,
+  ViewPropTypes,
 } from 'react-native';
 import { observer, Provider } from 'mobx-react';
 import { autorun, observable } from 'mobx';
@@ -113,9 +114,9 @@ let navInstanceExists = false;
 @observer
 export default class NavContainer extends React.Component {
   static propTypes = {
-    cardStyle: View.propTypes.style,
-    navBarStyle: View.propTypes.style,
-    tabStyle: View.propTypes.style,
+    cardStyle: ViewPropTypes.style,
+    navBarStyle: ViewPropTypes.style,
+    tabStyle: ViewPropTypes.style,
     logLevel: PropTypes.number,
   };
 

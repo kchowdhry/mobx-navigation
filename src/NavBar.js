@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ViewPropTypes,
 } from 'react-native';
 
 import PropTypes from 'prop-types';
@@ -70,7 +71,7 @@ const Right = (props) => {
 export default class NavBar extends React.Component {
   static propTypes = {
     navProps: PropTypes.object,
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
   };
 
   get node() {

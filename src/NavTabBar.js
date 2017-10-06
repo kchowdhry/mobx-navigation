@@ -6,6 +6,7 @@ import {
   Platform,
   StyleSheet,
   View,
+  ViewPropTypes,
 } from 'react-native';
 
 import { observable } from 'mobx';
@@ -58,7 +59,7 @@ export default class NavTabBar extends React.Component {
       }
     },
     height: PropTypes.number,
-    style: View.propTypes.style,
+    style: ViewPropTypes.style,
   };
 
 
