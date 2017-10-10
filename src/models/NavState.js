@@ -176,6 +176,19 @@ function registerChildMixin() {
   }
 }
 
+function unregisterChildMixin() {
+  Log.trace(`Child ${this.displayName || this.name || this.constructor.name} unmounted`);
+  if (this.context._mobxNavParent) {
+    // We've just unmounted inside a registered mobx navigation scene. Unregister ourselves
+    if (this.context._mobxNavParent._mobxNavChildren) {
+      const index = this.context._mobxNavParent._mobxNavChildren.findIndex(e => e === this);
+      if (index !== -1) {
+        this.context._mobxNavParent._mobxNavChildren.splice(index, 1);
+      }
+    }
+  }
+}
+
 export function child(target) {
   if (!target) {
     Log.error('Child decorator attached to invalid target');
@@ -192,6 +205,12 @@ export function child(target) {
     registerChildMixin.call(this);
   } : function() {
     registerChildMixin.call(this);
+  }
+  target.prototype.componentWillUnmount = base ? function() {
+    base.call(this);
+    unregisterChildMixin.call(this);
+  } : function() {
+    unregisterChildMixin.call(this);
   }
 
   // Thread the scene's context parameter through
