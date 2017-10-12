@@ -416,11 +416,11 @@ export class NavState {
       }
     }
 
-    const component = node.wrappedComponent;
     // We perform the componentWillShow as a mobx reaction because it isn't immediately available
-    if (!!node.element.wrappedRef) {
-      this.propagateLifecycleEvent(node.element.wrappedRef, 'componentWillShow');
-    }
+    when('node ref available', () => !!node.element.wrappedRef,
+      () => {
+        this.propagateLifecycleEvent(node.element.wrappedRef, 'componentWillShow');
+      });
 
     return new Promise((resolve) => {
       when('nav card mounted', () => node.element.mounted, () => {
