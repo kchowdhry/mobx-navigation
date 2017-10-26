@@ -199,15 +199,16 @@ export function child(target) {
   }
 
   // This is a react component. Modify it's prototype
-  const base = target.prototype.componentWillMount;
-  target.prototype.componentWillMount = base ? function() {
-    base.call(this);
+  const baseMountCB = target.prototype.componentWillMount;
+  target.prototype.componentWillMount = baseMountCB ? function() {
+    baseMountCB.call(this);
     registerChildMixin.call(this);
   } : function() {
     registerChildMixin.call(this);
   }
-  target.prototype.componentWillUnmount = base ? function() {
-    base.call(this);
+  const baseUnmountCB = target.prototype.componentWillUnmount;
+  target.prototype.componentWillUnmount = baseUnmountCB ? function() {
+    baseUnmountCB.call(this);
     unregisterChildMixin.call(this);
   } : function() {
     unregisterChildMixin.call(this);
